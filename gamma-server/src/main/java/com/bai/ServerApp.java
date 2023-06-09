@@ -38,12 +38,12 @@ public class ServerApp extends Container {
                             ch.writeAndFlush("nsdghiu");
                         }
                     })
-                    .option(ChannelOption.SO_BACKLOG, 128)
-                    .childOption(ChannelOption.SO_KEEPALIVE, true);
+                    .option(ChannelOption.SO_BACKLOG, 128)//连接队列最大长度
+                    .childOption(ChannelOption.SO_KEEPALIVE, true);//开启TCP keepalive机制
 
             ChannelFuture future = bootstrap.bind(port).sync();
             Channel channel = future.channel();
-            System.out.println("Server started on port " + port);
+            System.out.println("服务器端口监听:" + port);
 
             channel.closeFuture().sync();
         } catch (InterruptedException e) {
