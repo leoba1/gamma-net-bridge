@@ -1,13 +1,19 @@
 package com.bai.message;
 
-import java.util.Arrays;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
 
 /**
  * @author bzh
  * 🤪回来吧我的Java👈🏻🤣
  * Create Time:2023/6/7 16:25
  */
-public class MyMsg {
+@Data
+@ToString
+public abstract class Message {
 
     /** 心跳 */
     public static final byte TYPE_HEARTBEAT = 0X00;
@@ -21,31 +27,17 @@ public class MyMsg {
     /** 连接断开 */
     public static final byte TYPE_DISCONNECT = 0X09;
 
+    /** 通用异常信息 */
+    public static final byte TYPE_ERROR = 0x06;
+
     /** 数据类型 */
+    @Getter
+    @Setter
     private byte type;
 
     /** 消息传输数据 */
+    @Getter
+    @Setter
     private byte[] data;
-
-    public byte getType() {
-        return type;
-    }
-
-    public void setType(byte type) {
-        this.type = type;
-    }
-
-    public byte[] getData() {
-        return data;
-    }
-
-    public void setData(byte[] data) {
-        this.data = data;
-    }
-
-    @Override
-    public String toString() {
-        return "MyMsg [type=" + type + ", data=" + Arrays.toString(data) + "]";
-    }
 
 }
