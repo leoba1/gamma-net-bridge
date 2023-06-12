@@ -16,7 +16,7 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
         String msg = "Hello, server!";
         ByteBuf buf = Unpooled.buffer(msg.length());
         buf.writeBytes(msg.getBytes());
-        ctx.writeAndFlush(buf);
+        ctx.channel().writeAndFlush(buf);
     }
 
     @Override

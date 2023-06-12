@@ -16,6 +16,9 @@ import static com.bai.constants.CodecConstants.MAGIC_NUM;
 @Slf4j
 public class MessageEncoder extends MessageToByteEncoder<Message> {
 
+    public MessageEncoder() {
+    }
+
     @Override
     protected void encode(ChannelHandlerContext ctx, Message msg, ByteBuf out) throws Exception {
         //写入魔数4

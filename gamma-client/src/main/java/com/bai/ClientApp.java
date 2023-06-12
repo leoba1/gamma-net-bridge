@@ -1,20 +1,19 @@
 package com.bai;
 
+import com.bai.codec.MessageDecoder;
+import com.bai.codec.MessageEncoder;
 import com.bai.container.Container;
-import com.bai.handler.ClientHandler;
+import com.bai.message.Message;
 import io.netty.bootstrap.Bootstrap;
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.http.DefaultFullHttpRequest;
-import io.netty.handler.codec.http.HttpHeaderNames;
-import io.netty.handler.codec.http.HttpMethod;
-import io.netty.handler.codec.http.HttpVersion;
-import io.netty.handler.codec.string.StringEncoder;
+import io.netty.handler.logging.LogLevel;
+import io.netty.handler.logging.LoggingHandler;
 import lombok.extern.slf4j.Slf4j;
 
-import java.net.URI;
 
 /**
  * @author bzh
@@ -24,7 +23,7 @@ import java.net.URI;
 @Slf4j
 public class ClientApp extends Container {
 
-    private Channel channel=null;
+    private volatile Channel channel=null;
     EventLoopGroup group = new NioEventLoopGroup();
     private String host;
     private int port;
@@ -42,25 +41,39 @@ public class ClientApp extends Container {
             bootstrap.group(group)
                     .channel(NioSocketChannel.class)
                     .option(ChannelOption.SO_KEEPALIVE, true)
-                    .handler(new ChannelInitializer<SocketChannel>() {
+                    .handler(new ChannelInitializer<NioSocketChannel>() {
                         @Override
-                        protected void initChannel(SocketChannel ch) throws Exception {
-//                            ch.pipeline().addLast(new StringEncoder());
-                            ch.pipeline().addLast(new ClientHandler());
+                        protected void initChannel(NioSocketChannel ch) throws Exception {
+                            ch.pipeline().addLast(new LoggingHandler(LogLevel.DEBUG));
+                            ch.pipeline().addLast(new MessageDecoder());
+                            ch.pipeline().addLast(new MessageEncoder());
+//                            ch.pipeline().addLast(new ClientHandler());
+                            ch.pipeline().addLast(new SimpleChannelInboundHandler<Message>() {
+                                @Override
+                                public void channelActive(ChannelHandlerContext ctx) throws Exception {
+                                    Message message=new Message();
+                                    message.setData("hello".getBytes());
+                                    ctx.writeAndFlush(message);
+                                }
 
-                            URI uri = new URI("http://localhost:9090/news/page");
-                            // 构造GET请求
-                            DefaultFullHttpRequest request = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, uri.toASCIIString());
-                            // 添加Host头部信息
-                            request.headers().set(HttpHeaderNames.HOST, "localhost:9090");
-                            ch.writeAndFlush(request);
+                                @Override
+                                protected void channelRead0(ChannelHandlerContext ctx, Message msg) throws Exception {
+//                                    Message message=new Message();
+//                                    message.setData("qwert".getBytes());
+//                                    ctx.writeAndFlush(message);
+                                }
+                            });
+
                         }
                     });
 
             channel = bootstrap.connect(host, port).sync().channel();
             System.out.println("客户端连接到: " + host + ":" + port);
 
-            channel.closeFuture().sync();
+            channel.closeFuture().sync().addListener(future -> {
+                log.info("关闭中");
+                group.shutdownGracefully();
+            });
         } catch (InterruptedException e) {
             log.debug("服务错误",e);
         } finally {
@@ -70,12 +83,13 @@ public class ClientApp extends Container {
 
     @Override
     public void stop() {
-        channel.close();
+//        channel.close();
         group.shutdownGracefully();
         log.info("clientApp关闭服务");
     }
 
     public static void main(String[] args) {
-        new ClientApp("localhost", 9090).start();
+        ClientApp clientApp = new ClientApp("localhost", 8080);
+        clientApp.start();
     }
 }

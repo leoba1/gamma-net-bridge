@@ -4,12 +4,18 @@ import com.bai.codec.MessageDecoder;
 import com.bai.codec.MessageEncoder;
 import com.bai.container.Container;
 import com.bai.handler.ServerHandler;
+import com.bai.message.Message;
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.string.StringEncoder;
+import io.netty.handler.logging.LogLevel;
+import io.netty.handler.logging.LoggingHandler;
+
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author bzh
@@ -18,6 +24,7 @@ import io.netty.handler.codec.string.StringEncoder;
  */
 public class ServerApp extends Container {
 
+    private ConcurrentHashMap<ChannelId,Channel> map=new ConcurrentHashMap<>();
     private int port;
 
     public ServerApp(int port) {
@@ -35,16 +42,39 @@ public class ServerApp extends Container {
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel ch) throws Exception {
+                            ch.pipeline().addLast(new LoggingHandler(LogLevel.DEBUG));
                             ch.pipeline().addLast(new MessageEncoder());
-                            ch.pipeline().addLast(new MessageDecoder());
-                            ch.pipeline().addLast(new ServerHandler());
-                            ch.writeAndFlush("nsdghiu");
+//                            ch.pipeline().addLast(new MessageDecoder());
+                            ch.pipeline().addLast(new SimpleChannelInboundHandler<ByteBuf>() {
+                                @Override
+                                public void channelActive(ChannelHandlerContext ctx) throws Exception {
+                                    map.put(ctx.channel().id(),ctx.channel());
+                                    System.out.println("--------------------"+ctx.channel().id());
+                                }
+
+                                @Override
+                                protected void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) throws Exception {
+                                    Message message=new Message();
+                                    message.setData("world".getBytes());
+                                    Channel client = map.get(ctx.channel().id());
+                                    client.writeAndFlush(message);
+                                    ctx.writeAndFlush(message);
+                                }
+
+//                                @Override
+//                                protected void channelRead0(ChannelHandlerContext ctx, Message msg) throws Exception {
+//                                    Message message=new Message();
+//                                    message.setData("world".getBytes());
+//                                    ctx.writeAndFlush(message);
+//                                }
+                            });
+//                            ch.pipeline().addLast(new ServerHandler());
                         }
                     })
                     .option(ChannelOption.SO_BACKLOG, 128)//连接队列最大长度
-                    .childOption(ChannelOption.SO_KEEPALIVE, true);//开启TCP keepalive机制
+                    .childOption(ChannelOption.SO_KEEPALIVE, true)//开启TCP keepalive机制
                     //发送时滑动窗口大小，计算最大带宽延迟积(BDP):延迟(50ms)×带宽(4Mbps)/8=31.25KB
-//                    .childOption(ChannelOption.SO_SNDBUF,31 * 1024);
+                    .childOption(ChannelOption.SO_SNDBUF,31 * 1024);
 
             ChannelFuture future = bootstrap.bind(port).sync();
             Channel channel = future.channel();
