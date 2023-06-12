@@ -1,5 +1,7 @@
 package com.bai;
 
+import com.bai.codec.MessageDecoder;
+import com.bai.codec.MessageEncoder;
 import com.bai.container.Container;
 import com.bai.handler.ServerHandler;
 import io.netty.bootstrap.ServerBootstrap;
@@ -33,13 +35,16 @@ public class ServerApp extends Container {
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel ch) throws Exception {
-                            ch.pipeline().addLast(new StringEncoder());
+                            ch.pipeline().addLast(new MessageEncoder());
+                            ch.pipeline().addLast(new MessageDecoder());
                             ch.pipeline().addLast(new ServerHandler());
                             ch.writeAndFlush("nsdghiu");
                         }
                     })
                     .option(ChannelOption.SO_BACKLOG, 128)//连接队列最大长度
                     .childOption(ChannelOption.SO_KEEPALIVE, true);//开启TCP keepalive机制
+                    //发送时滑动窗口大小，计算最大带宽延迟积(BDP):延迟(50ms)×带宽(4Mbps)/8=31.25KB
+//                    .childOption(ChannelOption.SO_SNDBUF,31 * 1024);
 
             ChannelFuture future = bootstrap.bind(port).sync();
             Channel channel = future.channel();

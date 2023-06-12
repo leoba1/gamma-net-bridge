@@ -18,11 +18,13 @@ public class MessageEncoder extends MessageToByteEncoder<Message> {
 
     @Override
     protected void encode(ChannelHandlerContext ctx, Message msg, ByteBuf out) throws Exception {
-        //写入魔数
+        //写入魔数4
         out.writeBytes(MAGIC_NUM);
-        //数据类型
+        //数据类型1
         out.writeByte(msg.getType());
-        //消息长度
+        //版本号1
+        out.writeByte(1);
+        //消息长度4
         out.writeInt(msg.getData().length);
         //消息本身
         if (msg.getData() != null){

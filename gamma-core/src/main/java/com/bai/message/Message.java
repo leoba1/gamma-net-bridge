@@ -13,7 +13,7 @@ import lombok.ToString;
  */
 @Data
 @ToString
-public abstract class Message {
+public class Message {
 
     /** 心跳 */
     public static final byte TYPE_HEARTBEAT = 0X00;
