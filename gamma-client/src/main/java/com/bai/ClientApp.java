@@ -23,7 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ClientApp extends Container {
 
-    private volatile Channel channel=null;
+    private volatile Channel channel = null;
     EventLoopGroup group = new NioEventLoopGroup();
     private String host;
     private int port;
@@ -51,7 +51,7 @@ public class ClientApp extends Container {
                             ch.pipeline().addLast(new SimpleChannelInboundHandler<Message>() {
                                 @Override
                                 public void channelActive(ChannelHandlerContext ctx) throws Exception {
-                                    Message message=new Message();
+                                    Message message = new Message();
                                     message.setData("hello".getBytes());
                                     ctx.writeAndFlush(message);
                                 }
@@ -75,7 +75,7 @@ public class ClientApp extends Container {
                 group.shutdownGracefully();
             });
         } catch (InterruptedException e) {
-            log.debug("服务错误",e);
+            log.debug("服务错误", e);
         } finally {
             group.shutdownGracefully();
         }
