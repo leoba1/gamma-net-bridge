@@ -49,7 +49,7 @@ public class ServerApp extends Container {
                                 @Override
                                 public void channelActive(ChannelHandlerContext ctx) throws Exception {
                                     map.put(ctx.channel().id(),ctx.channel());
-                                    System.out.println("--------------------"+ctx.channel().id());
+                                    System.out.println(ctx.channel().id());
                                 }
 
                                 @Override
