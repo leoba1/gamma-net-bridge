@@ -12,6 +12,7 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 
@@ -21,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
  * Create Time:2023/6/7 14:03
  */
 @Slf4j
+@NoArgsConstructor
 public class ClientApp extends Container {
 
     private volatile Channel channel = null;
@@ -93,6 +95,6 @@ public class ClientApp extends Container {
         clientApp.start();
 
         RealClientAPP realClientApp =new RealClientAPP("localhost",9090);
-        realClientApp.start();
+//        realClientApp.start();
     }
 }

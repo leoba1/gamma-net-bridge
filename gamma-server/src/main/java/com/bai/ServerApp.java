@@ -1,31 +1,35 @@
 package com.bai;
 
-import com.bai.codec.MessageDecoder;
 import com.bai.codec.MessageEncoder;
 import com.bai.container.Container;
-import com.bai.handler.ServerHandler;
-import com.bai.message.Message;
+import com.bai.handler.TransferHandler;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.codec.string.StringEncoder;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
+ * 传输服务器，用于和客户端传输消息
  * @author bzh
  * 🤪回来吧我的Java👈🏻🤣
  * Create Time:2023/6/7 14:03
  */
 public class ServerApp extends Container {
 
-    private ConcurrentHashMap<String,ChannelHandlerContext> map=new ConcurrentHashMap<>();
+    //在channelHandler中是不共享的，但是在channel中是共享的
+    public static ConcurrentHashMap<String, ChannelHandlerContext> map = new ConcurrentHashMap<>();
+
     private int port;
+    EventLoopGroup bossGroup = new NioEventLoopGroup();
+    EventLoopGroup workerGroup = new NioEventLoopGroup();
+
+    //volatile关键字的作用是确保多个线程访问该变量时的可见性和有序性,防止数据不一致
+    private volatile Channel channel=null;
 
     public ServerApp(int port) {
         this.port = port;
@@ -33,8 +37,6 @@ public class ServerApp extends Container {
 
     @Override
     public void start() {
-        EventLoopGroup bossGroup = new NioEventLoopGroup();
-        EventLoopGroup workerGroup = new NioEventLoopGroup();
         try {
             ServerBootstrap bootstrap = new ServerBootstrap();
             bootstrap.group(bossGroup, workerGroup)
@@ -45,33 +47,7 @@ public class ServerApp extends Container {
                             ch.pipeline().addLast(new LoggingHandler(LogLevel.INFO));
                             ch.pipeline().addLast(new MessageEncoder());
 //                            ch.pipeline().addLast(new MessageDecoder());
-                            ch.pipeline().addLast(new SimpleChannelInboundHandler<ByteBuf>() {
-                                @Override
-                                public void channelActive(ChannelHandlerContext ctx) throws Exception {
-                                    if (map.size()==0){
-                                        map.put("test1",ctx);
-                                    }else {
-                                        map.put("test2",ctx);
-                                    }
-                                    System.out.println(ctx.channel().id());
-                                }
-
-                                @Override
-                                protected void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) throws Exception {
-                                    Message message=new Message();
-                                    byte[] data = new byte[msg.readableBytes()];
-                                    msg.readBytes(data);
-                                    message.setData(data);
-                                    ChannelHandlerContext client = map.get("test1");
-                                    if (client == null){
-                                        System.out.println("11111111111111111");
-                                        return;
-                                    }
-                                    client.writeAndFlush(message);
-//                                    ctx.writeAndFlush(message);
-                                }
-
-                            });
+                            ch.pipeline().addLast(new TransferHandler());
                         }
                     })
                     .option(ChannelOption.SO_BACKLOG, 128)//连接队列最大长度
@@ -80,7 +56,7 @@ public class ServerApp extends Container {
                     .childOption(ChannelOption.SO_SNDBUF,7 * 1024);
 
             ChannelFuture future = bootstrap.bind(port).sync();
-            Channel channel = future.channel();
+            channel = future.channel();
             System.out.println("服务器端口监听:" + port);
 
             channel.closeFuture().sync();
@@ -94,9 +70,9 @@ public class ServerApp extends Container {
 
     @Override
     public void stop() {
-//        channel.close();
-//        boss.shutdownGracefully();
-//        worker.shutdownGracefully();
+        channel.close();
+        bossGroup.shutdownGracefully();
+        workerGroup.shutdownGracefully();
     }
 
     public static void main(String[] args) {

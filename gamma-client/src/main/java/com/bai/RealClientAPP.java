@@ -1,12 +1,15 @@
 package com.bai;
 
 import com.bai.container.Container;
+import com.bai.handler.ClientHandler;
+import com.bai.handler.RealClientHandler;
 import com.bai.message.Message;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.logging.LoggingHandler;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -15,17 +18,20 @@ import lombok.extern.slf4j.Slf4j;
  * Create Time:2023/6/17 15:28
  */
 @Slf4j
+@NoArgsConstructor
 public class RealClientAPP extends Container {
     private String host;
     private int port;
     private volatile Channel channel = null;
     EventLoopGroup group = new NioEventLoopGroup();
 
+
     public RealClientAPP(String host, int port) {
         this.host = host;
         this.port = port;
     }
 
+    @Override
     public void start(){
         try {
             log.info("正在连接本地服务...");
@@ -37,23 +43,19 @@ public class RealClientAPP extends Container {
                         @Override
                         protected void initChannel(NioSocketChannel ch){
                             ch.pipeline().addLast(new LoggingHandler());
-                            ch.pipeline().addLast(new SimpleChannelInboundHandler<Message>() {
-                                @Override
-                                protected void channelRead0(ChannelHandlerContext ctx, Message msg) throws Exception {
-
-                                }
-                            });
+                            ch.pipeline().addLast(new ClientHandler());
+                            ch.pipeline().addLast(new RealClientHandler());
                         }
                     });
             channel = bootstrap.connect(host, port).sync().channel();
-            System.out.println("连接到本地服务: " + host + ":" + port);
+            log.info("连接到本地服务: "+host+":"+port);
 
             channel.closeFuture().sync().addListener(future -> {
                 log.info("关闭中");
                 group.shutdownGracefully();
             });
         }catch (InterruptedException e){
-            log.debug("服务错误",e);
+            log.info("服务错误",e);
         }finally {
             group.shutdownGracefully();
         }
