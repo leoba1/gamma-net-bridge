@@ -1,5 +1,6 @@
 package com.bai.message;
 
+import io.netty.buffer.ByteBuf;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;

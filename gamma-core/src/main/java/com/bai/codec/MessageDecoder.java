@@ -39,7 +39,7 @@ public class MessageDecoder extends LengthFieldBasedFrameDecoder {
     }
 
     @Override
-    protected Message decode(ChannelHandlerContext ctx, ByteBuf in) throws Exception {
+    protected Message decode(ChannelHandlerContext ctx, ByteBuf in) {
         Message message=new Message();
         //检查魔数,魔数只有4字节
         byte[] magic = new byte[4];
@@ -58,9 +58,11 @@ public class MessageDecoder extends LengthFieldBasedFrameDecoder {
         int length = in.readInt();
 
         byte[] bytes = new byte[length];
+
         in.readBytes(bytes);
         message.setData(bytes);
 
+        log.debug("接受的消息:{}",message);
         //message消息
         return message;
     }
