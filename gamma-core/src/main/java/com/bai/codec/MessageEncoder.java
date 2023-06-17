@@ -26,14 +26,14 @@ public class MessageEncoder extends MessageToByteEncoder<Message> {
     protected void encode(ChannelHandlerContext ctx, Message msg, ByteBuf out) {
         //写入魔数4
         out.writeBytes(MAGIC_NUM);
-        ByteBufUtils.bufLog(out);
+//        ByteBufUtils.bufLog(out);
         //数据类型1
         out.writeByte(msg.getType());
         //版本号1
         out.writeByte(1);
         //消息长度4
         out.writeInt(msg.getData().length);
-        ByteBufUtils.bufLog(out);
+//        ByteBufUtils.bufLog(out);
 
         try {
             // 消息本身
@@ -44,7 +44,8 @@ public class MessageEncoder extends MessageToByteEncoder<Message> {
             log.debug("",e);
         }
 
+        System.out.println("消息已编码：");
         ByteBufUtils.bufLog(out);
-        log.debug("消息:",msg.getData());
+//        log.debug("消息:",msg.getData());
     }
 }

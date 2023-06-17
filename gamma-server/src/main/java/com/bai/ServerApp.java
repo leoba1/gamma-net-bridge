@@ -53,7 +53,6 @@ public class ServerApp extends Container {
                                     }else {
                                         map.put("test2",ctx);
                                     }
-//                                    map.put(ctx.channel().id()+"",ctx.channel());
                                     System.out.println(ctx.channel().id());
                                 }
 
@@ -63,7 +62,6 @@ public class ServerApp extends Container {
                                     byte[] data = new byte[msg.readableBytes()];
                                     msg.readBytes(data);
                                     message.setData(data);
-//                                    Channel client = map.get(ctx.channel().id()+"");
                                     ChannelHandlerContext client = map.get("test1");
                                     if (client == null){
                                         System.out.println("11111111111111111");

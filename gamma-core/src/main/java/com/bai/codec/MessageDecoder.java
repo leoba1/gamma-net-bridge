@@ -2,6 +2,7 @@ package com.bai.codec;
 
 import cn.hutool.core.util.ArrayUtil;
 import com.bai.message.Message;
+import com.bai.utils.ByteBufUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
@@ -59,10 +60,11 @@ public class MessageDecoder extends LengthFieldBasedFrameDecoder {
 
         byte[] bytes = new byte[length];
 
-        in.readBytes(bytes);
+        ByteBuf buf = in.readBytes(bytes);
         message.setData(bytes);
 
-        log.debug("接受的消息:{}",message);
+        System.out.println("接受的消息:");
+        ByteBufUtils.bufLog(buf);
         //message消息
         return message;
     }

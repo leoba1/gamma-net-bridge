@@ -83,7 +83,7 @@ public class ClientApp extends Container {
 
     @Override
     public void stop() {
-//        channel.close();
+        channel.close();
         group.shutdownGracefully();
         log.info("clientApp关闭服务");
     }
@@ -91,5 +91,8 @@ public class ClientApp extends Container {
     public static void main(String[] args) {
         ClientApp clientApp = new ClientApp("localhost", 8080);
         clientApp.start();
+
+        RealClientAPP realClientApp =new RealClientAPP("localhost",9090);
+        realClientApp.start();
     }
 }
