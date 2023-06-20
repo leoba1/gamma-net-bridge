@@ -1,8 +1,10 @@
 package com.bai.handler;
 
-import com.bai.ServerApp;
+import com.bai.constants.Constants;
 import com.bai.message.Message;
+import com.bai.server.TransportServer;
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.extern.slf4j.Slf4j;
@@ -17,10 +19,15 @@ public class TransferHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        if (ServerApp.map.size() == 0) {
-            ServerApp.map.put("test1", ctx);
+
+        //跟客户端建立连接后
+//        ctx.attr(Constants.BIND_CHANNEL).set(123321);
+//        123321.attr(Constants.BIND_CHANNEL).set(ctx);
+
+        if (TransportServer.map.size() == 0) {
+            TransportServer.map.put("test1", ctx);
         } else {
-            ServerApp.map.put("test2", ctx);
+            TransportServer.map.put("test2", ctx);
         }
         System.out.println(ctx.channel().id());
     }
@@ -31,7 +38,7 @@ public class TransferHandler extends SimpleChannelInboundHandler<ByteBuf> {
         byte[] data = new byte[msg.readableBytes()];
         msg.readBytes(data);
         message.setData(data);
-        ChannelHandlerContext client = ServerApp.map.get("test1");
+        ChannelHandlerContext client = TransportServer.map.get("test1");
         if (client == null) {
             System.out.println("代理连接未建立！！！");
             return;

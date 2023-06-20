@@ -8,9 +8,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.Arrays;
-
-import static com.bai.constants.CodecConstants.MAGIC_NUM;
+import static com.bai.constants.Constants.MAGIC_NUM;
 
 /**
  * @author bzh

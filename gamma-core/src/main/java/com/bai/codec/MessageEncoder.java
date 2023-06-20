@@ -1,15 +1,13 @@
 package com.bai.codec;
 
-import cn.hutool.core.util.ByteUtil;
 import com.bai.message.Message;
 import com.bai.utils.ByteBufUtils;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufUtil;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 import lombok.extern.slf4j.Slf4j;
 
-import static com.bai.constants.CodecConstants.MAGIC_NUM;
+import static com.bai.constants.Constants.MAGIC_NUM;
 
 /**
  * @author bzh
