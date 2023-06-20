@@ -70,7 +70,7 @@ public class ClientApp extends Container {
                     });
 
             channel = bootstrap.connect(host, port).sync().channel();
-            System.out.println("客户端连接到: " + host + ":" + port);
+            log.info("客户端连接到远程主机:"+ host + ":" + port);
 
             channel.closeFuture().sync().addListener(future -> {
                 log.info("关闭中");
