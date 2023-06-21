@@ -1,7 +1,10 @@
 package com.bai;
 
 import com.bai.client.TransportClient;
+import com.bai.processor.ConnectTransportProcessor;
+import io.netty.channel.Channel;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -12,7 +15,7 @@ import org.springframework.context.annotation.Configuration;
  * Create Time:2023/6/7 14:03
  */
 @Configuration
-@ComponentScan("com.bai")
+@ComponentScan
 public class ClientApp {
 
     public static void main(String[] args) {
@@ -21,12 +24,13 @@ public class ClientApp {
             //初始化IOC容器
             context=new AnnotationConfigApplicationContext(ClientApp.class);
 
-            TransportClient client = context.getBean(TransportClient.class);
-            client.start();
+            ConnectTransportProcessor bean = context.getBean(ConnectTransportProcessor.class);
+            bean.startTransportConnect();
+
+            // 注册关闭钩子
+            context.registerShutdownHook();
         } catch (BeansException e) {
-            throw new RuntimeException(e);
-        } finally {
-            System.out.println("关闭IOC容器");
+            e.printStackTrace();
         }
     }
 }

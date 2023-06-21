@@ -12,6 +12,8 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Bean;
+import org.springframework.stereotype.Service;
 
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -22,58 +24,40 @@ import java.util.concurrent.ConcurrentHashMap;
  * Create Time:2023/6/20 15:47
  */
 @Slf4j
-
+@Service
 public class TransportServer extends Container {
     //在channelHandler中是不共享的，但是在channel中是共享的
     public static ConcurrentHashMap<String, ChannelHandlerContext> map = new ConcurrentHashMap<>();
 
-    private int port;
     EventLoopGroup bossGroup = new NioEventLoopGroup();
     EventLoopGroup workerGroup = new NioEventLoopGroup();
 
-    //volatile关键字的作用是确保多个线程访问该变量时的可见性和有序性,防止数据不一致
-    private volatile Channel channel=null;
-
-    public TransportServer(int port) {
-        this.port = port;
-    }
 
     @Override
-    public void start() {
-        try {
-            ServerBootstrap bootstrap = new ServerBootstrap();
-            bootstrap.group(bossGroup, workerGroup)
-                    .channel(NioServerSocketChannel.class)
-                    .childHandler(new ChannelInitializer<NioSocketChannel>() {
-                        @Override
-                        protected void initChannel(NioSocketChannel ch) throws Exception {
-                            ch.pipeline().addLast(new LoggingHandler(LogLevel.INFO));
-                            ch.pipeline().addLast(new MessageEncoder());
+    @Bean("transportServerBootstrap")
+    public ServerBootstrap initServer() {
+        ServerBootstrap bootstrap = new ServerBootstrap();
+        bootstrap.group(bossGroup, workerGroup)
+                .channel(NioServerSocketChannel.class)
+                .childHandler(new ChannelInitializer<NioSocketChannel>() {
+                    @Override
+                    protected void initChannel(NioSocketChannel ch) throws Exception {
+                        ch.pipeline().addLast(new LoggingHandler(LogLevel.INFO));
+                        ch.pipeline().addLast(new MessageEncoder());
 //                            ch.pipeline().addLast(new MessageDecoder());
-                            ch.pipeline().addLast(new TransferHandler());
-                        }
-                    })
-                    .option(ChannelOption.SO_BACKLOG, 128)//连接队列最大长度,boosGroup线程
-                    .childOption(ChannelOption.SO_KEEPALIVE, true)//开启TCP keepalive机制,workerGroup线程
-                    //发送时滑动窗口大小，计算最大带宽延迟积(BDP):延迟(50ms)×带宽(4Mbps)/8=31.25KB
-                    .childOption(ChannelOption.SO_SNDBUF,7 << 10);
-
-            ChannelFuture future = bootstrap.bind(port).sync();
-            channel = future.channel();
-            System.out.println("服务器端口监听:" + port);
-
-            channel.closeFuture().sync();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } finally {
-            workerGroup.shutdownGracefully();
-            bossGroup.shutdownGracefully();
-        }
+                        ch.pipeline().addLast(new TransferHandler());
+                    }
+                })
+                .option(ChannelOption.SO_BACKLOG, 128)//连接队列最大长度,boosGroup线程
+                .childOption(ChannelOption.SO_KEEPALIVE, true)//开启TCP keepalive机制,workerGroup线程
+                //发送时滑动窗口大小，计算最大带宽延迟积(BDP):延迟(50ms)×带宽(4Mbps)/8=31.25KB
+                .childOption(ChannelOption.SO_SNDBUF,7 << 10);
+        return bootstrap;
     }
+
 
     @Override
     public void stop() {
-        channel.close();
         bossGroup.shutdownGracefully();
         workerGroup.shutdownGracefully();
     }
