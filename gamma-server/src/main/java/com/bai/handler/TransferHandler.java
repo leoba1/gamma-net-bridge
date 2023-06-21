@@ -15,7 +15,7 @@ import lombok.extern.slf4j.Slf4j;
  * Create Time:2023/6/17 15:44
  */
 @Slf4j
-public class TransferHandler extends SimpleChannelInboundHandler<ByteBuf> {
+public class TransferHandler extends SimpleChannelInboundHandler<Message> {
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
@@ -33,17 +33,14 @@ public class TransferHandler extends SimpleChannelInboundHandler<ByteBuf> {
     }
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) throws Exception {
-        Message message = new Message();
-        byte[] data = new byte[msg.readableBytes()];
-        msg.readBytes(data);
-        message.setData(data);
+    protected void channelRead0(ChannelHandlerContext ctx, Message msg) throws Exception {
+
         ChannelHandlerContext client = TransportServer.map.get("test1");
         if (client == null) {
             System.out.println("代理连接未建立！！！");
             return;
         }
-        client.writeAndFlush(message);
+        client.writeAndFlush(msg);
 //        ctx.writeAndFlush(message);
     }
 }

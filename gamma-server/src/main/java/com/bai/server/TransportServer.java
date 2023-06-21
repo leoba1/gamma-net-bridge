@@ -36,8 +36,8 @@ public class TransportServer extends Container {
     @Override
     @Bean("transportServerBootstrap")
     public ServerBootstrap initServer() {
-        ServerBootstrap bootstrap = new ServerBootstrap();
-        bootstrap.group(bossGroup, workerGroup)
+        ServerBootstrap transportBootstrap = new ServerBootstrap();
+        transportBootstrap.group(bossGroup, workerGroup)
                 .channel(NioServerSocketChannel.class)
                 .childHandler(new ChannelInitializer<NioSocketChannel>() {
                     @Override
@@ -52,7 +52,7 @@ public class TransportServer extends Container {
                 .childOption(ChannelOption.SO_KEEPALIVE, true)//开启TCP keepalive机制,workerGroup线程
                 //发送时滑动窗口大小，计算最大带宽延迟积(BDP):延迟(50ms)×带宽(4Mbps)/8=31.25KB
                 .childOption(ChannelOption.SO_SNDBUF,7 << 10);
-        return bootstrap;
+        return transportBootstrap;
     }
 
 
