@@ -20,7 +20,7 @@ public class TransferHandler extends SimpleChannelInboundHandler<ByteBuf> {
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
 
-        //跟客户端建立连接后
+//        跟客户端建立连接后
 //        ctx.attr(Constants.BIND_CHANNEL).set(123321);
 //        123321.attr(Constants.BIND_CHANNEL).set(ctx);
 

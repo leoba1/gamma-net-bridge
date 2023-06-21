@@ -10,6 +10,10 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.logging.LoggingHandler;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
 /**
  * 本地服务代理客户端
@@ -19,7 +23,13 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @NoArgsConstructor
+@Configuration
+@ComponentScan("com.bai.client")
 public class RealProxyClient extends Container {
+
+    @Autowired
+    private Bootstrap realProxyBootstrap;
+
     private String host;
     private int port;
     private volatile Channel channel = null;
@@ -35,20 +45,18 @@ public class RealProxyClient extends Container {
     public void start(){
         try {
             log.info("正在连接本地服务...");
-            Bootstrap bootstrap = new Bootstrap();
-            bootstrap.group(group)
+            realProxyBootstrap.group(group)
                     .channel(NioSocketChannel.class)
                     .option(ChannelOption.SO_KEEPALIVE, true)
                     .handler(new ChannelInitializer<NioSocketChannel>() {
                         @Override
                         protected void initChannel(NioSocketChannel ch){
                             ch.pipeline().addLast(new LoggingHandler());
-                            ch.pipeline().addLast(new TransportClientHandler());
                             ch.pipeline().addLast(new RealClientHandler());
                         }
                     });
-            channel = bootstrap.connect(host, port).sync().channel();
-            log.info("连接到本地服务: "+host+":"+port);
+            channel = realProxyBootstrap.connect(host, port).sync().channel();
+            log.info("已连接到本地服务: "+host+":"+port);
 
             channel.closeFuture().sync().addListener(future -> {
                 log.info("关闭中");
