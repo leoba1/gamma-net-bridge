@@ -20,11 +20,10 @@ public class ServerApp {
         try {
             //初始化IOC容器
             context=new AnnotationConfigApplicationContext(ServerApp.class);
-
+            //获取bean
             ConnectTransportProcessor bean = context.getBean(ConnectTransportProcessor.class);
             bean.startServerConnect();
-
-            // 注册关闭钩子
+            // 注册关闭钩子,在程序退出时关闭
             context.registerShutdownHook();
         } catch (BeansException e) {
             e.printStackTrace();

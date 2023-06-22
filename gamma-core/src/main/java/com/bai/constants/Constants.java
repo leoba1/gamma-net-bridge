@@ -1,8 +1,7 @@
 package com.bai.constants;
 
 import io.netty.util.AttributeKey;
-
-import java.nio.channels.Channel;
+import io.netty.channel.Channel;
 
 /**
  * @author bzh

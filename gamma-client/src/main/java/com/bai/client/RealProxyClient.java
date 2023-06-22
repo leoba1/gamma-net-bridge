@@ -1,7 +1,7 @@
 package com.bai.client;
 
+import com.bai.codec.MessageDecoder;
 import com.bai.container.Container;
-import com.bai.handler.TransportClientHandler;
 import com.bai.handler.RealClientHandler;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
@@ -42,6 +42,7 @@ public class RealProxyClient extends Container {
                     @Override
                     protected void initChannel(NioSocketChannel ch) {
                         ch.pipeline().addLast(new LoggingHandler());
+                        ch.pipeline().addLast(new MessageDecoder());
                         ch.pipeline().addLast(new RealClientHandler());
                     }
                 });

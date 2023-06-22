@@ -5,6 +5,7 @@ import io.netty.channel.Channel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
@@ -30,6 +31,7 @@ public class ConnectRealProcessor {
     @Value("${client.port}")
     private int localPort;
 
+    @Bean("realChannel")
     public Channel startRealConnect(){
         Channel realChannel = null;
         try {

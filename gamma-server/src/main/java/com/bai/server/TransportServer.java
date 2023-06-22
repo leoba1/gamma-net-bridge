@@ -1,5 +1,6 @@
 package com.bai.server;
 
+import com.bai.codec.MessageDecoder;
 import com.bai.codec.MessageEncoder;
 import com.bai.container.Container;
 import com.bai.handler.TransferHandler;
@@ -44,7 +45,7 @@ public class TransportServer extends Container {
                     protected void initChannel(NioSocketChannel ch) throws Exception {
                         ch.pipeline().addLast(new LoggingHandler(LogLevel.INFO));
                         ch.pipeline().addLast(new MessageEncoder());
-//                            ch.pipeline().addLast(new MessageDecoder());
+                            ch.pipeline().addLast(new MessageDecoder());
                         ch.pipeline().addLast(new TransferHandler());
                     }
                 })

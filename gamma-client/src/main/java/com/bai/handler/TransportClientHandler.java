@@ -1,9 +1,11 @@
 package com.bai.handler;
 
-import com.bai.client.TransportClient;
 import com.bai.message.Message;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+
+import static com.bai.constants.Constants.BIND_CHANNEL;
 
 
 /**
@@ -22,14 +24,23 @@ public class TransportClientHandler extends SimpleChannelInboundHandler<Message>
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Message msg) throws Exception {
+        Channel realChannel = ctx.channel().attr(BIND_CHANNEL).get();
+        realChannel.writeAndFlush(msg);
+    }
+
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
 
     }
 
 
-
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        Channel realChannel = ctx.channel().attr(BIND_CHANNEL).get();
+        if (realChannel == null && !realChannel.isActive()){
+            realChannel.close();
+        }
+        ctx.channel().close();
         cause.printStackTrace();
-        new TransportClient().stop();
     }
 }

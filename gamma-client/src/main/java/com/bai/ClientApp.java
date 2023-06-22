@@ -1,10 +1,7 @@
 package com.bai;
 
-import com.bai.client.TransportClient;
-import com.bai.processor.ConnectTransportProcessor;
-import io.netty.channel.Channel;
+import com.bai.processor.BindProcessor;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -23,11 +20,11 @@ public class ClientApp {
         try {
             //初始化IOC容器
             context=new AnnotationConfigApplicationContext(ClientApp.class);
+            //获取bean
+            BindProcessor bean = context.getBean(BindProcessor.class);
+            bean.bindChannel();
 
-            ConnectTransportProcessor bean = context.getBean(ConnectTransportProcessor.class);
-            bean.startTransportConnect();
-
-            // 注册关闭钩子
+            // 注册关闭钩子,在程序退出时关闭
             context.registerShutdownHook();
         } catch (BeansException e) {
             e.printStackTrace();

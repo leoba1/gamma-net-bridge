@@ -30,6 +30,7 @@ public class ConnectTransportProcessor {
     @Value("${server.port}")
     private int remotePort;
 
+    @Bean("transportChannel")
     public Channel startTransportConnect(){
         Channel transportChannel = null;
         try {
