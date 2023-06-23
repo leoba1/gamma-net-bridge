@@ -31,7 +31,7 @@ public class ConnectProxyProcessor {
         Channel channel = null;
         try {
             channel = proxyServerBootstrap.bind(port).sync().channel();
-            log.info("传输服务已在port:"+port+"上开启");
+            log.info("反向代理服务已在port:"+port+"上开启");
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

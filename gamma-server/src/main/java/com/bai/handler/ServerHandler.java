@@ -1,5 +1,6 @@
 package com.bai.handler;
 
+import com.bai.temp;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -12,7 +13,13 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 public class ServerHandler extends ChannelInboundHandlerAdapter {
 
     @Override
+    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+
+    }
+
+    @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+
         ByteBuf buf = (ByteBuf) msg;
         try {
             byte[] bytes = new byte[buf.readableBytes()];

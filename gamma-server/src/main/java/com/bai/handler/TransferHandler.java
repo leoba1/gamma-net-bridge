@@ -1,10 +1,8 @@
 package com.bai.handler;
 
-import com.bai.constants.Constants;
 import com.bai.message.Message;
 import com.bai.server.TransportServer;
-import io.netty.buffer.ByteBuf;
-import io.netty.channel.Channel;
+import com.bai.temp;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.extern.slf4j.Slf4j;
@@ -19,14 +17,14 @@ public class TransferHandler extends SimpleChannelInboundHandler<Message> {
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
+        temp.map.put("justTest", ctx.channel());
 
-
-        if (TransportServer.map.size() == 0) {
-            TransportServer.map.put("test1", ctx);
-        } else {
-            TransportServer.map.put("test2", ctx);
-        }
-        System.out.println(ctx.channel().id());
+//        if (TransportServer.map.size() == 0) {
+//            TransportServer.map.put("test1", ctx);
+//        } else {
+//            TransportServer.map.put("test2", ctx);
+//        }
+//        System.out.println(ctx.channel().id());
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.bai;
 
+import com.bai.processor.ConnectProxyProcessor;
 import com.bai.processor.ConnectTransportProcessor;
 import org.springframework.beans.BeansException;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -23,6 +24,9 @@ public class ServerApp {
             //获取bean
             ConnectTransportProcessor bean = context.getBean(ConnectTransportProcessor.class);
             bean.startServerConnect();
+
+            ConnectProxyProcessor beanTest = context.getBean(ConnectProxyProcessor.class);
+            beanTest.startProxyServerConnect();
             // 注册关闭钩子,在程序退出时关闭
             context.registerShutdownHook();
         } catch (BeansException e) {
