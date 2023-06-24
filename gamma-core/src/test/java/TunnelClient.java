@@ -4,8 +4,11 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.logging.LogLevel;
+import io.netty.handler.logging.LoggingHandler;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 
 public class TunnelClient {
@@ -29,6 +32,7 @@ public class TunnelClient {
                         @Override
                         protected void initChannel(SocketChannel ch) throws Exception {
                             ChannelPipeline pipeline = ch.pipeline();
+                            pipeline.addLast( new LoggingHandler(LogLevel.DEBUG));
                             pipeline.addLast(new TunnelClientHandler());
                         }
                     });
@@ -51,8 +55,11 @@ public class TunnelClient {
             }
 
             future.channel().closeFuture().sync();
-        } finally {
-            group.shutdownGracefully();
+
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 

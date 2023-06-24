@@ -3,7 +3,6 @@ package com.bai.client;
 import com.bai.codec.MessageDecoder;
 import com.bai.codec.MessageEncoder;
 import com.bai.container.Container;
-import com.bai.handler.message.TestHandler;
 import com.bai.handler.TransportClientHandler;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
