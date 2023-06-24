@@ -42,8 +42,8 @@ public class MessageEncoder extends MessageToByteEncoder<Message> {
             log.debug("",e);
         }
 
-        System.out.println("消息已编码：");
-        ByteBufUtils.bufLog(out);
+//        System.out.println("消息已编码：");
+//        ByteBufUtils.bufLog(out);
 //        log.debug("消息:",msg.getData());
     }
 }

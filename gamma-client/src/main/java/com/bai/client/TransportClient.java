@@ -3,6 +3,7 @@ package com.bai.client;
 import com.bai.codec.MessageDecoder;
 import com.bai.codec.MessageEncoder;
 import com.bai.container.Container;
+import com.bai.handler.message.TestHandler;
 import com.bai.handler.TransportClientHandler;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
@@ -39,6 +40,7 @@ public class TransportClient extends Container {
                         ch.pipeline().addLast(new LoggingHandler(LogLevel.DEBUG));
                         ch.pipeline().addLast(new MessageDecoder());
                         ch.pipeline().addLast(new MessageEncoder());
+//                        ch.pipeline().addLast(new TestHandler());
                         ch.pipeline().addLast(new TransportClientHandler());
                     }
                 });
