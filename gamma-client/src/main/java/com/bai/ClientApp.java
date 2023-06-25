@@ -1,6 +1,8 @@
 package com.bai;
 
 import com.bai.processor.BindProcessor;
+import com.bai.processor.ConnectRealProcessor;
+import com.bai.processor.ConnectTransportProcessor;
 import org.springframework.beans.BeansException;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
@@ -21,8 +23,13 @@ public class ClientApp {
             //初始化IOC容器
             context=new AnnotationConfigApplicationContext(ClientApp.class);
             //获取bean
-            BindProcessor bean = context.getBean(BindProcessor.class);
-            bean.bindChannel();
+//            ConnectRealProcessor bean = context.getBean(ConnectRealProcessor.class);
+//            bean.startRealConnect();
+//
+//            ConnectTransportProcessor connectTransportProcessor = context.getBean(ConnectTransportProcessor.class);
+//            connectTransportProcessor.startTransportConnect();
+
+            new BindProcessor().bindChannel();
 
             // 注册关闭钩子,在程序退出时关闭
             context.registerShutdownHook();

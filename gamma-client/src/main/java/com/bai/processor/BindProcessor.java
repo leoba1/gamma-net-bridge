@@ -14,16 +14,11 @@ import static com.bai.constants.Constants.BIND_CHANNEL;
  * Create Time:2023/6/22 19:40
  */
 @Configuration
-@ComponentScan
 public class BindProcessor {
 
-    @Autowired
-    private Channel transportChannel;
-
-    @Autowired
-    private Channel realChannel;
-
     public void bindChannel(){
+        Channel transportChannel = ConnectTransportProcessor.getTransportChannel();
+        Channel realChannel = ConnectRealProcessor.getRealChannel();
         //绑定channel关系
         transportChannel.attr(BIND_CHANNEL).set(realChannel);
         realChannel.attr(BIND_CHANNEL).set(transportChannel);

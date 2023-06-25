@@ -21,8 +21,6 @@ import java.util.concurrent.TimeUnit;
 @Configuration
 public class RealClientHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
-    @Autowired
-    BindProcessor bindProcessor;
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         log.info("已连接到本地的服务");

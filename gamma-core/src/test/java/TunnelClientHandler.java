@@ -1,3 +1,4 @@
+import com.bai.executor.ScheduledExecutor;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -6,6 +7,9 @@ public class TunnelClientHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         System.out.println("Connected to server: " + ctx.channel().remoteAddress());
+        ScheduledExecutor.Executor(() -> {
+            ctx.channel().writeAndFlush("ping".getBytes());
+        });
     }
 
     @Override

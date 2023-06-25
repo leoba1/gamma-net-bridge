@@ -5,10 +5,7 @@ import io.netty.channel.Channel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.*;
 
 /**
  * 连接本地服务
@@ -31,9 +28,9 @@ public class ConnectRealProcessor {
     @Value("${client.port}")
     private int localPort;
 
-    @Bean("realChannel")
+    private static volatile Channel realChannel;
+
     public Channel startRealConnect(){
-        Channel realChannel = null;
         try {
             realChannel = realProxyBootstrap.connect(localHost, localPort).sync().channel();
             log.info("已连接到本地服务:"+ localHost + ":" + localPort);
@@ -43,5 +40,16 @@ public class ConnectRealProcessor {
         return realChannel;
     }
 
+    //单例模式获取channel
+    public static Channel getRealChannel(){
+        if (realChannel == null || !realChannel.isActive()){
+            synchronized (ConnectRealProcessor.class){
+                if (realChannel == null || !realChannel.isActive()) {
+                    realChannel = new ConnectRealProcessor().startRealConnect();
+                }
+            }
+        }
+        return realChannel;
+    }
 
 }
