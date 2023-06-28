@@ -20,6 +20,7 @@ public class ClientApp {
     public static void main(String[] args) {
         AnnotationConfigApplicationContext context = null;
         try {
+
             //初始化IOC容器
             context=new AnnotationConfigApplicationContext(ClientApp.class);
             //获取bean
@@ -33,6 +34,7 @@ public class ClientApp {
 
             // 注册关闭钩子,在程序退出时关闭
             context.registerShutdownHook();
+
         } catch (BeansException e) {
             e.printStackTrace();
         }
