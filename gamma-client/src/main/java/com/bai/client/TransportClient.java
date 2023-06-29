@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 public class TransportClient extends Container {
+    //线程组
     NioEventLoopGroup group = new NioEventLoopGroup();
 
     @Bean("transportBootstrap")
