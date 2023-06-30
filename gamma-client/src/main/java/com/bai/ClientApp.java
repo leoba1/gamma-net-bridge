@@ -21,9 +21,9 @@ public class ClientApp {
         AnnotationConfigApplicationContext context = null;
         try {
 
-            //初始化IOC容器
+            //初始化IOC容器1
             context=new AnnotationConfigApplicationContext(ClientApp.class);
-            //获取bean
+            //获取bean2
 //            ConnectRealProcessor bean = context.getBean(ConnectRealProcessor.class);
 //            bean.startRealConnect();
 //
