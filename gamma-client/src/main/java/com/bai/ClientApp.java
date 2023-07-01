@@ -27,6 +27,7 @@ public class ClientApp {
 //            ConnectRealProcessor bean = context.getBean(ConnectRealProcessor.class);
 //            bean.startRealConnect();
 //
+
 //            ConnectTransportProcessor connectTransportProcessor = context.getBean(ConnectTransportProcessor.class);
 //            connectTransportProcessor.startTransportConnect();
 
