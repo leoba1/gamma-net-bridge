@@ -33,8 +33,10 @@ public class ClientApp {
 
             new BindProcessor().bindChannel();
 
+
             // 注册关闭钩子,在程序退出时关闭
             context.registerShutdownHook();
+
 
         } catch (BeansException e) {
             e.printStackTrace();
