@@ -31,6 +31,17 @@ public class Message {
     /** 通用异常信息 */
     public static final byte TYPE_ERROR = 0x06;
 
+    /** 请求 */
+    public static final byte REQ = 0x03;
+
+    /** 响应 */
+    public static final byte RESP = 0x04;
+
+    /** 请求或者响应 */
+    @Getter
+    @Setter
+    private byte ReqOrResp;
+
     /** 数据类型 */
     @Getter
     @Setter

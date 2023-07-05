@@ -24,12 +24,12 @@ public class ClientApp {
             //初始化IOC容器1
             context=new AnnotationConfigApplicationContext(ClientApp.class);
             //获取bean2
-//            ConnectRealProcessor bean = context.getBean(ConnectRealProcessor.class);
-//            bean.startRealConnect();
+            ConnectRealProcessor bean = context.getBean(ConnectRealProcessor.class);
+            bean.startRealConnect();
 //
 
-//            ConnectTransportProcessor connectTransportProcessor = context.getBean(ConnectTransportProcessor.class);
-//            connectTransportProcessor.startTransportConnect();
+            ConnectTransportProcessor connectTransportProcessor = context.getBean(ConnectTransportProcessor.class);
+            connectTransportProcessor.startTransportConnect();
 
             new BindProcessor().bindChannel();
 

@@ -1,8 +1,6 @@
 package com.bai.processor;
 
 import io.netty.channel.Channel;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 import static com.bai.constants.Constants.BIND_CHANNEL;

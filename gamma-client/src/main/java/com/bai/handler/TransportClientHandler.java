@@ -23,9 +23,9 @@ import static com.bai.constants.Constants.BIND_CHANNEL;
 public class TransportClientHandler extends SimpleChannelInboundHandler<Message> {
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        Message message = new Message();
-        message.setData("hello".getBytes());
-        ctx.writeAndFlush(message);
+//        Message message = new Message();
+//        message.setData("hello".getBytes());
+//        ctx.writeAndFlush(message);
     }
 
     @Override

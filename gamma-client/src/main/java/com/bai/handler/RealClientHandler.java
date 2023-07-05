@@ -1,15 +1,13 @@
 package com.bai.handler;
 
-import com.bai.executor.ScheduledExecutor;
-import com.bai.processor.BindProcessor;
+import com.bai.message.Message;
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
-
-import java.util.concurrent.TimeUnit;
+import static com.bai.constants.Constants.BIND_CHANNEL;
 
 /**
  * 被代理服务的信息处理
@@ -34,5 +32,12 @@ public class RealClientHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) throws Exception {
+        log.info("收到本地服务的消息");
+        Channel transportChannel = ctx.channel().attr(BIND_CHANNEL).get();
+        Message message=new Message();
+        byte[] bytes = new byte[msg.readableBytes()];
+        msg.readBytes(bytes);
+        message.setData(bytes);
+        transportChannel.writeAndFlush(message);
     }
 }

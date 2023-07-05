@@ -9,6 +9,8 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.codec.http.HttpResponseEncoder;
+import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import lombok.extern.slf4j.Slf4j;
@@ -44,7 +46,8 @@ public class TransportServer extends Container {
                     protected void initChannel(NioSocketChannel ch) throws Exception {
                         ch.pipeline().addLast(new LoggingHandler(LogLevel.INFO));
                         ch.pipeline().addLast(new MessageEncoder());
-                            ch.pipeline().addLast(new MessageDecoder());
+                        ch.pipeline().addLast(new MessageDecoder());
+                        ch.pipeline().addLast(new HttpResponseEncoder());
                         ch.pipeline().addLast(new TransferHandler());
                     }
                 })

@@ -2,7 +2,10 @@ package com.bai.handler;
 
 import com.bai.message.Message;
 import com.bai.server.TransportServer;
+import com.bai.session.SessionFactory;
 import com.bai.temp;
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.extern.slf4j.Slf4j;
@@ -29,13 +32,21 @@ public class TransferHandler extends SimpleChannelInboundHandler<Message> {
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Message msg) throws Exception {
+        log.info("收到返回的消息");
+        Channel proxyChannel = SessionFactory.getSession().getChannel(ctx.channel());
+        ByteBuf buffer = ctx.alloc().buffer();
 
-        ChannelHandlerContext client = TransportServer.map.get("test1");
-        if (client == null) {
-            System.out.println("代理连接未建立！！！");
-            return;
-        }
-        client.writeAndFlush(msg);
+        buffer.writeBytes(msg.getData());
+//        buffer.writeBytes("<h1>hello world</h1>".getBytes());
+
+        proxyChannel.writeAndFlush(buffer);
+
+//        ChannelHandlerContext client = TransportServer.map.get("test1");
+//        if (client == null) {
+//            System.out.println("代理连接未建立！！！");
+//            return;
+//        }
+//        client.writeAndFlush(msg);
 //        ctx.writeAndFlush(message);
     }
 }
