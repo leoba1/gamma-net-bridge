@@ -1,6 +1,5 @@
 package com.bai.handler;
 
-import com.bai.temp;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;

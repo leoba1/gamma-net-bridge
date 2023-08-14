@@ -43,4 +43,9 @@ public interface Session {
      * @return channel
      */
     Channel getChannel(Channel channel);
+
+    /**
+     * 获取容器中的个数
+     */
+    int size();
 }

@@ -37,7 +37,6 @@ public class TransferHandler extends SimpleChannelInboundHandler<Message> {
         ByteBuf buffer = ctx.alloc().buffer();
 
         buffer.writeBytes(msg.getData());
-//        buffer.writeBytes("<h1>hello world</h1>".getBytes());
 
         proxyChannel.writeAndFlush(buffer);
 

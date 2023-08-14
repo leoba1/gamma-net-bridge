@@ -46,8 +46,15 @@ public class SessionMemory implements Session{
     }
 
     @Override
+    public int size() {
+        return channelBind.size();
+    }
+
+    @Override
     public String toString() {
         return channelBind.toString();
     }
+
+
 
 }
