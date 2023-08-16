@@ -2,7 +2,6 @@ package com.bai.handler;
 
 import com.bai.message.Message;
 import com.bai.session.SessionFactory;
-import com.bai.temp;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -21,8 +20,6 @@ public class ProxyServerHandler extends SimpleChannelInboundHandler<ByteBuf> {
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         log.debug("代理连接建立成功,channelId:{}", ctx.channel().id());
         //保存channel，及其id
-        Channel channel = temp.map.get("justTest");
-        SessionFactory.getSession().bind(ctx.channel(), channel);
         log.info("当前总服务连接数：{}", SessionFactory.getSession().size());
     }
 
