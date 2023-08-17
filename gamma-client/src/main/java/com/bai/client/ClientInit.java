@@ -1,5 +1,6 @@
 package com.bai.client;
 
+import com.bai.utils.Regex;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
@@ -9,6 +10,7 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import lombok.extern.slf4j.Slf4j;
 
 /**
+ * 服务器初始化,共用
  * @author bzh
  * 🤪回来吧我的Java👈🏻🤣
  * Create Time:2023/8/16 16:36
@@ -25,11 +27,15 @@ public class ClientInit {
      * @param host ip地址
      * @param port 端口号
      */
-    public void start(NioEventLoopGroup group, ChannelInitializer channelInitializer, String host, Integer port){
+    public void init(NioEventLoopGroup group, ChannelInitializer channelInitializer, String host, Integer port){
+
+        Regex.checkHost(host);
+        Regex.checkPort(port.toString());
+
         log.info("正在启动服务...");
         try {
-            Bootstrap transportBootstrap = new Bootstrap();
-            channel = transportBootstrap.group(group)
+            Bootstrap bootstrap = new Bootstrap();
+            channel = bootstrap.group(group)
                     .channel(NioSocketChannel.class)
                     //保持长连接
                     .option(ChannelOption.SO_KEEPALIVE, true)
@@ -40,6 +46,8 @@ public class ClientInit {
             });
 
         } catch (InterruptedException e) {
+            group.shutdownGracefully();
+            e.printStackTrace();
             throw new RuntimeException(e);
         }
     }
