@@ -3,9 +3,9 @@ package com.bai.processor;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.*;
+//import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.beans.factory.annotation.Value;
+//import org.springframework.context.annotation.*;
 
 /**
  * 连接本地服务
@@ -14,18 +14,19 @@ import org.springframework.context.annotation.*;
  * Create Time:2023/6/21 16:43
  */
 @Slf4j
-@Configuration
-@ComponentScan
-@PropertySource("classpath:config.properties")
+@Deprecated
+//@Configuration
+//@ComponentScan
+//@PropertySource("classpath:config.properties")
 public class ConnectRealProcessor {
 
-    @Autowired
+//    @Autowired
     private Bootstrap realProxyBootstrap;
 
-    @Value("${client.host}")
+//    @Value("${client.host}")
     private String localHost;
 
-    @Value("${client.port}")
+//    @Value("${client.port}")
     private int localPort;
 
     private static volatile Channel realChannel;

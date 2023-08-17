@@ -1,5 +1,7 @@
 package com.bai;
 
+import com.bai.client.ClientStarter;
+
 /**
  * 启动客户端
  * @author bzh
@@ -8,6 +10,6 @@ package com.bai;
  */
 public class ClientApplication {
     public static void main(String[] args) {
-
+        new ClientStarter().start();
     }
 }

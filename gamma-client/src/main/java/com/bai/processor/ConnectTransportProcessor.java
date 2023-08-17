@@ -3,9 +3,9 @@ package com.bai.processor;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.*;
+//import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.beans.factory.annotation.Value;
+//import org.springframework.context.annotation.*;
 
 /**
  * @author bzh
@@ -13,18 +13,19 @@ import org.springframework.context.annotation.*;
  * Create Time:2023/6/21 14:30
  */
 @Slf4j
-@Configuration
-@ComponentScan
-@PropertySource("classpath:config.properties")
+//@Configuration
+//@ComponentScan
+//@PropertySource("classpath:config.properties")
+@Deprecated
 public class ConnectTransportProcessor {
 
-    @Autowired
+//    @Autowired
     private Bootstrap transportBootstrap;
 
-    @Value("${server.host}")
+//    @Value("${server.host}")
     private String remoteHost;
 
-    @Value("${server.port}")
+//    @Value("${server.port}")
     private int remotePort;
 
     private static volatile Channel transportChannel;

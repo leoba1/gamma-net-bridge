@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
  */
 @Slf4j
 @Service
+@Deprecated
 public class ReverseProxyServer extends Container {
     EventLoopGroup bossGroup = new NioEventLoopGroup();
     EventLoopGroup workerGroup = new NioEventLoopGroup();

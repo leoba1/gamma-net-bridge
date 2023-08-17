@@ -27,6 +27,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @Slf4j
 @Service
+@Deprecated
 public class TransportServer extends Container {
     //在channelHandler中是不共享的，但是在channel中是共享的
     public static ConcurrentHashMap<String, ChannelHandlerContext> map = new ConcurrentHashMap<>();

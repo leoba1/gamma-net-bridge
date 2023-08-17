@@ -1,2 +1,8 @@
 server:
   port: 9090
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://gz-cynosdbmysql-grp-fdyfgehp.sql.tencentcdb.com:21179/?useSSL=false
+    username: root
+    password: BaiGe2001(%*)

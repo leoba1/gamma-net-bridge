@@ -11,8 +11,6 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Bean;
-import org.springframework.stereotype.Service;
 
 /**
  * 传输客户端，用于和客户端传输消息
@@ -21,12 +19,11 @@ import org.springframework.stereotype.Service;
  * Create Time:2023/6/20 16:34
  */
 @Slf4j
-@Service
+@Deprecated
 public class TransportClient extends Container {
     //线程组
     NioEventLoopGroup group = new NioEventLoopGroup();
 
-    @Bean("transportBootstrap")
     @Override
     public Bootstrap initClient() {
         log.info("正在启动服务...");

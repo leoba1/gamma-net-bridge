@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit;
  * 🤪回来吧我的Java👈🏻🤣
  * Create Time:2023/6/24 20:40
  */
+@Deprecated
 public class ScheduledExecutor {
 
     private static ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);

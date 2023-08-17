@@ -13,5 +13,5 @@ public interface Constants {
     byte[] MAGIC_NUM={'C','A','F','E'};
 
     //AttributeMap的Key
-    AttributeKey<Channel> BIND_CHANNEL=AttributeKey.newInstance("bind_channel");
+//    AttributeKey<Channel> BIND_CHANNEL=AttributeKey.newInstance("bind_channel");
 }

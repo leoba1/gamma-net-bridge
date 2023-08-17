@@ -12,8 +12,6 @@ import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.logging.LoggingHandler;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Bean;
-import org.springframework.stereotype.Service;
 
 /**
  * 本地服务代理客户端
@@ -23,12 +21,12 @@ import org.springframework.stereotype.Service;
  * Create Time:2023/6/17 15:28
  */
 @Slf4j
+@Deprecated
 @NoArgsConstructor
-@Service
 public class RealProxyClient extends Container {
     NioEventLoopGroup group = new NioEventLoopGroup();
 
-    @Bean("realProxyBootstrap")
+//    @Bean("realProxyBootstrap")
     @Override
     public Bootstrap initClient() {
         log.info("正在连接本地服务...");

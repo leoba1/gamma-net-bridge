@@ -1,10 +1,11 @@
 package com.bai.message;
 
-import io.netty.buffer.ByteBuf;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+
+import java.util.Map;
 
 
 /**
@@ -19,7 +20,7 @@ public class Message {
     /** 心跳 */
     public static final byte TYPE_HEARTBEAT = 0X00;
 
-    /** 连接成功 */
+    /** 连接 */
     public static final byte TYPE_CONNECT = 0X01;
 
     /** 数据传输 */
@@ -31,16 +32,16 @@ public class Message {
     /** 通用异常信息 */
     public static final byte TYPE_ERROR = 0x06;
 
-    /** 请求 */
-    public static final byte REQ = 0x03;
+    /** 注册请求 */
+    public static final byte REG = 0x03;
 
-    /** 响应 */
-    public static final byte RESP = 0x04;
+    /** 注册确认 */
+    public static final byte CONFIRM = 0x04;
 
-    /** 请求或者响应 */
+    /** 元数据(记录数据来源) */
     @Getter
     @Setter
-    private byte ReqOrResp;
+    private Map<String,Object> metaData;
 
     /** 数据类型 */
     @Getter

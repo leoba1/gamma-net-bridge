@@ -53,6 +53,9 @@ public class MessageDecoder extends LengthFieldBasedFrameDecoder {
         //版本号
         in.readByte();
 
+        //TODO 元数据
+        in.
+
         //获取消息长度
         int length = in.readInt();
 

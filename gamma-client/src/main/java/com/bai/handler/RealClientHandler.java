@@ -6,7 +6,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Configuration;
+//import org.springframework.context.annotation.Configuration;
 import static com.bai.constants.Constants.BIND_CHANNEL;
 
 /**
@@ -16,7 +16,8 @@ import static com.bai.constants.Constants.BIND_CHANNEL;
  * Create Time:2023/6/17 16:50
  */
 @Slf4j
-@Configuration
+@Deprecated
+//@Configuration
 public class RealClientHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
     @Override
