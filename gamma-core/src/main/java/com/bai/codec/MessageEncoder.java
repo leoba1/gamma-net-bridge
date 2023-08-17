@@ -27,7 +27,6 @@ public class MessageEncoder extends MessageToByteEncoder<Message> {
     protected void encode(ChannelHandlerContext ctx, Message msg, ByteBuf out) {
         //写入魔数4
         out.writeBytes(MAGIC_NUM);
-//        ByteBufUtils.bufLog(out);
         //数据类型1
         out.writeByte(msg.getType());
         //版本号1
@@ -37,24 +36,17 @@ public class MessageEncoder extends MessageToByteEncoder<Message> {
         //元数据长度4
         out.writeInt(jsonStr.getBytes().length);
         //元数据
-        out.write(jsonStr.getBytes(StandardCharsets.UTF_8));
-
+        out.writeBytes(jsonStr.getBytes(StandardCharsets.UTF_8));
 
         //消息长度4
         out.writeInt(msg.getData().length);
-//        ByteBufUtils.bufLog(out);
-
         try {
             // 消息本身
             if (msg.getData() != null) {
-                out.wr(msg.getData());
+                out.writeBytes(msg.getData());
             }
         } catch (Exception e) {
-            log.debug("",e);
+            log.info("出现错误：",e);
         }
-
-//        System.out.println("消息已编码：");
-//        ByteBufUtils.bufLog(out);
-//        log.debug("消息:",msg.getData());
     }
 }

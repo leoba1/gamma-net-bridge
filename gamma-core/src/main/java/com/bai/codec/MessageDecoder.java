@@ -1,12 +1,17 @@
 package com.bai.codec;
 
+import cn.hutool.core.lang.TypeReference;
 import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.json.JSONUtil;
 import com.bai.message.Message;
 import com.bai.utils.ByteBufUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import lombok.extern.slf4j.Slf4j;
+
+import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 import static com.bai.constants.Constants.MAGIC_NUM;
 
@@ -53,19 +58,27 @@ public class MessageDecoder extends LengthFieldBasedFrameDecoder {
         //版本号
         in.readByte();
 
-        //TODO 元数据
-        in.
+        //元数据
+        int metadataLength = in.readInt();
+        byte[] metadata=new byte[metadataLength];
+        if (in.readableBytes() < metadataLength) {
+            in.resetReaderIndex();
+            return null;
+        }
+        in.readBytes(metadata);
+        String jsonStr = new String(metadata, StandardCharsets.UTF_8);
+        Map<String, Object> metaData = JSONUtil.parseObj(jsonStr);
+        message.setMetaData(metaData);
 
-        //获取消息长度
-        int length = in.readInt();
 
-        byte[] bytes = new byte[length];
+        int dataLength = in.readInt();
+        byte[] bytes = new byte[dataLength];
 
-        ByteBuf buf = in.readBytes(bytes);
+        in.readBytes(bytes);
         message.setData(bytes);
 
-        System.out.println("接受的消息:");
-        ByteBufUtils.bufLog(buf);
+//        System.out.println("接受的消息:");
+//        ByteBufUtils.bufLog(buf);
         //message消息
         return message;
     }
