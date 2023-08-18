@@ -34,7 +34,7 @@ public class ServerInit {
                     //发送时滑动窗口大小，计算最大带宽延迟积(BDP):延迟(50ms)×带宽(4Mbps)/8=31.25KB
                     .childOption(ChannelOption.SO_SNDBUF,7 << 10)
                     .bind(host, port).sync().channel();
-            log.info("穿透服务已在"+host+":"+port+"启动");
+            log.info("传输服务已在"+host+":"+port+"启动");
 
             channel.closeFuture().addListener(future -> {
                 channel.close();
@@ -46,5 +46,9 @@ public class ServerInit {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
+    }
+
+    public Channel getChannel(){
+        return channel;
     }
 }

@@ -3,8 +3,8 @@ package com.bai.server;
 import com.bai.codec.MessageDecoder;
 import com.bai.codec.MessageEncoder;
 import com.bai.container.Container;
-import com.bai.handler.HeartBeatHandler;
 import com.bai.handler.ServerHandler;
+import com.bai.utils.ConfigReaderUtil;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
@@ -37,7 +37,9 @@ public class ServerStarter extends Container {
         };
 
         ServerInit serverInit = new ServerInit();
-        serverInit.init(boosGroup, workerGroup, channelInitializer, "localhost", 8080);
+        String host = ConfigReaderUtil.ConfigReader("server.host");
+        int port = Integer.parseInt(ConfigReaderUtil.ConfigReader("server.port"));
+        serverInit.init(boosGroup, workerGroup, channelInitializer, host, port);
 
     }
 

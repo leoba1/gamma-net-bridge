@@ -5,6 +5,7 @@ import com.bai.codec.MessageEncoder;
 import com.bai.container.Container;
 import com.bai.handler.ClientHandler;
 import com.bai.handler.HeartBeatHandler;
+import com.bai.utils.ConfigReaderUtil;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
@@ -38,7 +39,9 @@ public class ClientStarter extends Container {
         };
 
         ClientInit clientInit = new ClientInit();
-        clientInit.init(group, channelInitializer, "127.0.0.1", 8080);
+        String host = ConfigReaderUtil.ConfigReader("server.host");
+        int port = Integer.parseInt(ConfigReaderUtil.ConfigReader("server.port"));
+        clientInit.init(group, channelInitializer, host, port);
     }
 
     @Override

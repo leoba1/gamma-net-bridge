@@ -19,25 +19,8 @@ import lombok.extern.slf4j.Slf4j;
 public class ProxyServerHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        log.debug("代理连接建立成功,channelId:{}", ctx.channel().id());
-        //保存channel，及其id
-        log.info("当前总服务连接数：{}", SessionFactory.getSession().size());
+
     }
-
-//    @Override
-//    protected void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) throws Exception {
-//        //把每个channel进行编号
-//        log.debug("收到请求，开始转发，channelId:{}", ctx.channel().id());
-//
-//
-//        //转换成Message消息
-//        Message message = new Message();
-//        byte[] data = new byte[msg.readableBytes()];
-//        msg.readBytes(data);
-//        message.setData(data);
-//        SessionFactory.getSession().getChannel(ctx.channel()).writeAndFlush(message);
-//    }
-
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
