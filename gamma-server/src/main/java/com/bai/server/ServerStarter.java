@@ -4,6 +4,7 @@ import com.bai.codec.MessageDecoder;
 import com.bai.codec.MessageEncoder;
 import com.bai.container.Container;
 import com.bai.handler.HeartBeatHandler;
+import com.bai.handler.ServerHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
@@ -29,7 +30,8 @@ public class ServerStarter extends Container {
                 ch.pipeline().addLast(new LoggingHandler(LogLevel.DEBUG));
                 ch.pipeline().addLast(new MessageDecoder());
                 ch.pipeline().addLast(new MessageEncoder());
-                ch.pipeline().addLast(new HeartBeatHandler(HeartBeatHandler.READ_IDLE_TIME, HeartBeatHandler.WRITE_IDLE_TIME));
+                ch.pipeline().addLast(new ServerHandler());
+//                ch.pipeline().addLast(new HeartBeatHandler(HeartBeatHandler.READ_IDLE_TIME, HeartBeatHandler.WRITE_IDLE_TIME));
 
             }
         };

@@ -38,6 +38,11 @@ public class MessageEncoder extends MessageToByteEncoder<Message> {
         //元数据
         out.writeBytes(jsonStr.getBytes(StandardCharsets.UTF_8));
 
+        if (msg.getData() == null || msg.getData().length == 0) {
+            //消息长度4
+            out.writeInt(0);
+            return;
+        }
         //消息长度4
         out.writeInt(msg.getData().length);
         try {

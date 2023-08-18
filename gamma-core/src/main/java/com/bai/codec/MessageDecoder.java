@@ -42,6 +42,7 @@ public class MessageDecoder extends LengthFieldBasedFrameDecoder {
         super(Integer.MAX_VALUE, 6, 4, 0, 0);
     }
 
+
     @Override
     protected Message decode(ChannelHandlerContext ctx, ByteBuf in) {
         Message message=new Message();
@@ -70,7 +71,10 @@ public class MessageDecoder extends LengthFieldBasedFrameDecoder {
         Map<String, Object> metaData = JSONUtil.parseObj(jsonStr);
         message.setMetaData(metaData);
 
-
+        //原本的数据
+        if (in.readInt() == 0) {
+            return message;
+        }
         int dataLength = in.readInt();
         byte[] bytes = new byte[dataLength];
 

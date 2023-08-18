@@ -32,7 +32,7 @@ public class ClientStarter extends Container {
                 ch.pipeline().addLast(new MessageDecoder());
                 ch.pipeline().addLast(new MessageEncoder());
                 ch.pipeline().addLast(new ClientHandler());
-                ch.pipeline().addLast(new HeartBeatHandler(HeartBeatHandler.READ_IDLE_TIME,HeartBeatHandler.WRITE_IDLE_TIME-5));
+//                ch.pipeline().addLast(new HeartBeatHandler(HeartBeatHandler.READ_IDLE_TIME,HeartBeatHandler.WRITE_IDLE_TIME-5));
 
             }
         };
