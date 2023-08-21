@@ -29,15 +29,41 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
         String token = ConfigReaderUtil.ConfigReader("token");
         portsMapping.put("token", token);
         //发送给服务器
-        log.info("正在连接服务器");
         message.setMetaData(portsMapping);
-
+        log.info("正在连接服务器");
         ctx.writeAndFlush(message);
     }
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        super.channelRead(ctx, msg);
+        Message message = (Message) msg;
+        byte type = message.getType();
+        switch (type) {
+            case Message.TYPE_CONNECT:
+                //开启本地端口监听
+                //TODO
+                break;
+            case Message.TYPE_TRANSFER:
+                //处理代理逻辑
+                //TODO
+                break;
+            case Message.TYPE_DISCONNECT:
+                //断开连接
+                break;
+            case Message.TYPE_ERROR:
+                //异常信息
+                break;
+            case Message.TYPE_HEARTBEAT:
+                //心跳
+                break;
+            case Message.CONFIRM:
+                //注册确认
+                break;
+            default:
+                //非法请求
+                log.info("非法请求");
+                ctx.channel().close();
+        }
     }
 
     @Override

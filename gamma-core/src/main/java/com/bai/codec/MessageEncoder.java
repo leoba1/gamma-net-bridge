@@ -32,26 +32,31 @@ public class MessageEncoder extends MessageToByteEncoder<Message> {
         //版本号1
         out.writeByte(2);
 
-        String jsonStr = JSONUtil.toJsonStr(msg.getMetaData());
-        //元数据长度4
-        out.writeInt(jsonStr.getBytes().length);
-        //元数据
-        out.writeBytes(jsonStr.getBytes(StandardCharsets.UTF_8));
+
+        if (msg.getMetaData() == null || msg.getMetaData().isEmpty()) {
+            //元数据长度4
+            out.writeInt(0);
+        } else {
+            String jsonStr = JSONUtil.toJsonStr(msg.getMetaData());
+            //元数据长度4
+            out.writeInt(jsonStr.getBytes().length);
+            //元数据
+            if (jsonStr.getBytes().length > 0) {
+                out.writeBytes(jsonStr.getBytes(StandardCharsets.UTF_8));
+            }
+        }
+
 
         if (msg.getData() == null || msg.getData().length == 0) {
             //消息长度4
             out.writeInt(0);
-            return;
-        }
-        //消息长度4
-        out.writeInt(msg.getData().length);
-        try {
+        } else {
+            //消息长度4
+            out.writeInt(msg.getData().length);
             // 消息本身
             if (msg.getData() != null) {
                 out.writeBytes(msg.getData());
             }
-        } catch (Exception e) {
-            log.info("出现错误：",e);
         }
     }
 }

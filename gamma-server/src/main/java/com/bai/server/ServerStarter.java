@@ -6,10 +6,13 @@ import com.bai.container.Container;
 import com.bai.handler.ServerHandler;
 import com.bai.utils.ConfigReaderUtil;
 import io.netty.channel.ChannelInitializer;
+import io.netty.channel.group.ChannelGroup;
+import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
+import io.netty.util.concurrent.GlobalEventExecutor;
 
 /**
  * @author bzh
@@ -18,8 +21,9 @@ import io.netty.handler.logging.LoggingHandler;
  */
 public class ServerStarter extends Container {
 
-    NioEventLoopGroup boosGroup = new NioEventLoopGroup();
-    NioEventLoopGroup workerGroup = new NioEventLoopGroup();
+    private final NioEventLoopGroup boosGroup = new NioEventLoopGroup();
+    private final NioEventLoopGroup workerGroup = new NioEventLoopGroup();
+    private final ChannelGroup channelGroup=new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
 
     @Override
     public void start() {
@@ -30,7 +34,7 @@ public class ServerStarter extends Container {
                 ch.pipeline().addLast(new LoggingHandler(LogLevel.DEBUG));
                 ch.pipeline().addLast(new MessageDecoder());
                 ch.pipeline().addLast(new MessageEncoder());
-                ch.pipeline().addLast(new ServerHandler());
+                ch.pipeline().addLast(new ServerHandler(channelGroup));
 //                ch.pipeline().addLast(new HeartBeatHandler(HeartBeatHandler.READ_IDLE_TIME, HeartBeatHandler.WRITE_IDLE_TIME));
 
             }

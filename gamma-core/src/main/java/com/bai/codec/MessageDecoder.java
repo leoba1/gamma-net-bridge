@@ -61,15 +61,13 @@ public class MessageDecoder extends LengthFieldBasedFrameDecoder {
 
         //元数据
         int metadataLength = in.readInt();
-        byte[] metadata=new byte[metadataLength];
-        if (in.readableBytes() < metadataLength) {
-            in.resetReaderIndex();
-            return null;
+        if (metadataLength!=0){
+            byte[] metadata=new byte[metadataLength];
+            in.readBytes(metadata);
+            String jsonStr = new String(metadata, StandardCharsets.UTF_8);
+            Map<String, Object> metaData = JSONUtil.parseObj(jsonStr);
+            message.setMetaData(metaData);
         }
-        in.readBytes(metadata);
-        String jsonStr = new String(metadata, StandardCharsets.UTF_8);
-        Map<String, Object> metaData = JSONUtil.parseObj(jsonStr);
-        message.setMetaData(metaData);
 
         //原本的数据
         if (in.readInt() == 0) {
