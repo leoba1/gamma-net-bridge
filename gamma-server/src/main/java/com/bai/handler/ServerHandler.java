@@ -2,20 +2,28 @@ package com.bai.handler;
 
 import com.bai.message.Message;
 import com.bai.processor.ServerProcessor;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.group.ChannelGroup;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
+
+import static com.bai.constants.Constants.ERROR_MSG;
+
 /**
  * 处理客户端的消息
+ *
  * @author bzh
  * 🤪回来吧我的Java👈🏻🤣
  * Create Time:2023/6/8 20:07
  */
 @Slf4j
 public class ServerHandler extends ChannelInboundHandlerAdapter {
-
+    //visitorId和channel的映射
+    public static ConcurrentHashMap<String, Channel> channelMap=new ConcurrentHashMap<>();
     private static ServerProcessor serverProcessor = new ServerProcessor();
     //是否注册
     private boolean isReg = false;
@@ -37,18 +45,18 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         Message message = (Message) msg;
         byte type = message.getType();
-        if (isReg){//已经注册了
+        if (isReg) {//已经注册了
             //处理消息转发逻辑
             //TODO
-        }else if (type == Message.REG){
+        } else if (type == Message.REG) {
             //处理注册逻辑
 //            ServerProcessor.getInstance().ProcessReg(ctx,message);
-            serverProcessor.ProcessReg(ctx,message);
+            serverProcessor.ProcessReg(ctx, message);
             //注册成功
             Message confirmMessage = new Message();
             confirmMessage.setType(Message.CONFIRM);
             isReg = true;
-        }else {
+        } else {
             //未注册，且不是注册消息，直接关闭连接
             log.info("非法请求!");
             ctx.channel().close();
@@ -59,14 +67,20 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         //TODO 移除信息
+        isReg = false;
         serverChannelGroup.remove(ctx.channel());
         ctx.close();
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        Message message = new Message();
+        message.setType(Message.TYPE_ERROR);
+        HashMap<String, Object> map = new HashMap<>();
+        map.put(ERROR_MSG, cause);
+        message.setMetaData(map);
+        ctx.channel().writeAndFlush(message);
         serverChannelGroup.remove(ctx.channel());
-
         cause.printStackTrace();
         ctx.close();
     }

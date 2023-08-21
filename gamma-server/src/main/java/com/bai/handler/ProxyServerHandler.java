@@ -34,6 +34,7 @@ public class ProxyServerHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
+        ServerHandler.channelMap.put(ctx.channel().id().asLongText(),ctx.channel());
         proxyChannelGroup.add(ctx.channel());
         //有请求过来，开启本地客户端连接
         Message message=new Message();
@@ -51,6 +52,7 @@ public class ProxyServerHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        ServerHandler.channelMap.remove(ctx.channel().id().asLongText());
         ctx.channel().close();
         proxyChannelGroup.remove(ctx.channel());
         if (proxyChannelGroup.isEmpty()){
@@ -62,6 +64,7 @@ public class ProxyServerHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        ServerHandler.channelMap.remove(ctx.channel().id().asLongText());
         proxyChannelGroup.remove(ctx.channel());
         if (proxyChannelGroup.isEmpty()){
             serverChannel.close();

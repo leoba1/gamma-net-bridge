@@ -4,6 +4,7 @@ import com.bai.handler.ProxyServerHandler;
 import com.bai.message.Message;
 import com.bai.server.ServerInit;
 import com.bai.utils.ConfigReaderUtil;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.group.ChannelGroup;
@@ -17,6 +18,7 @@ import io.netty.util.concurrent.GlobalEventExecutor;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 处理注册、消息转发逻辑
@@ -33,6 +35,8 @@ public class ServerProcessor {
 
     /**
      * 处理注册逻辑，开启对应的端口监听
+     * @param ctx
+     * @param message
      */
     public void ProcessReg(ChannelHandlerContext ctx, Message message) {
         Map<String, Object> metaData = message.getMetaData();

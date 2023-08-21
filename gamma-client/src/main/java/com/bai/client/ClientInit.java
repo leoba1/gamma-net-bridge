@@ -51,4 +51,8 @@ public class ClientInit {
             throw new RuntimeException(e);
         }
     }
+
+    public Channel getChannel(){
+        return channel;
+    }
 }
