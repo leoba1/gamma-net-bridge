@@ -1,6 +1,7 @@
 package com.bai.handler;
 
 import com.bai.message.Message;
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -11,7 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.HashMap;
 
 /**
- *反向代理处理器，处理外部发出来的请求
+ * 反向代理处理器，处理外部发出来的请求
+ *
  * @author bzh
  * 🤪回来吧我的Java👈🏻🤣
  * Create Time:2023/6/17 17:03
@@ -25,7 +27,7 @@ public class ProxyServerHandler extends ChannelInboundHandlerAdapter {
     private NioEventLoopGroup workerGroup;
 
     public ProxyServerHandler(NioEventLoopGroup bossGroup, NioEventLoopGroup workerGroup,
-                              ChannelGroup proxyChannelGroup,Channel serverChannel) {
+                              ChannelGroup proxyChannelGroup, Channel serverChannel) {
         this.serverChannel = serverChannel;
         this.proxyChannelGroup = proxyChannelGroup;
         this.bossGroup = bossGroup;
@@ -34,11 +36,11 @@ public class ProxyServerHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        ServerHandler.channelMap.put(ctx.channel().id().asLongText(),ctx.channel());
+        ServerHandler.channelMap.put(ctx.channel().id().asLongText(), ctx.channel());
         proxyChannelGroup.add(ctx.channel());
         //有请求过来，开启本地客户端连接
-        Message message=new Message();
-        HashMap<String, Object> map=new HashMap<>();
+        Message message = new Message();
+        HashMap<String, Object> map = new HashMap<>();
         map.put("visitorId", ctx.channel().id().asLongText());
         message.setMetaData(map);
         message.setType(Message.TYPE_CONNECT);
@@ -47,7 +49,19 @@ public class ProxyServerHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        super.channelRead(ctx, msg);
+        if (msg == null || ctx==null){
+            return;
+        }
+        //接受到外部的请求
+        byte[] data = (byte[]) msg;
+        Message message = new Message();
+        message.setType(Message.TYPE_TRANSFER);
+        message.setData(data);
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("visitorId", ctx.channel().id().asLongText());
+        message.setMetaData(map);
+        serverChannel.writeAndFlush(message);
+
     }
 
     @Override
@@ -55,7 +69,7 @@ public class ProxyServerHandler extends ChannelInboundHandlerAdapter {
         ServerHandler.channelMap.remove(ctx.channel().id().asLongText());
         ctx.channel().close();
         proxyChannelGroup.remove(ctx.channel());
-        if (proxyChannelGroup.isEmpty()){
+        if (proxyChannelGroup.isEmpty()) {
             serverChannel.close();
             bossGroup.shutdownGracefully();
             workerGroup.shutdownGracefully();
@@ -66,7 +80,7 @@ public class ProxyServerHandler extends ChannelInboundHandlerAdapter {
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         ServerHandler.channelMap.remove(ctx.channel().id().asLongText());
         proxyChannelGroup.remove(ctx.channel());
-        if (proxyChannelGroup.isEmpty()){
+        if (proxyChannelGroup.isEmpty()) {
             serverChannel.close();
             bossGroup.shutdownGracefully();
             workerGroup.shutdownGracefully();

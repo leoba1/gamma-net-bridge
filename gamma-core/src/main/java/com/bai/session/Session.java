@@ -9,11 +9,12 @@ import io.netty.channel.Channel;
  */
 public interface Session {
     /**
-     * 绑定两个channel，相互绑定
-     * @param myChannel 哪个 channel 要绑定
-     * @param otherChannel 绑定
+     * 绑定
+     * @param channel 哪个 channel 要绑定会话
+     * @param visitorId 绑定的会话
      */
-    void bind(Channel myChannel, Channel otherChannel);
+    void bind(Channel channel, String visitorId);
+
 
     /**
      * 相互解绑
@@ -22,27 +23,23 @@ public interface Session {
     void unbind(Channel channel);
 
     /**
-     * 获取属性
-     * @param channel 哪个 channel
-     * @param name 属性名
-     * @return 属性值
+     * 相互解绑
+     * @param id 会话 id
      */
-    Object getAttribute(Channel channel, String name);
+    void unbind(String id);
 
     /**
-     * 设置属性
-     * @param channel 哪个 channel
-     * @param name 属性名
-     * @param value 属性值
+     * 获取会话
+     * @param id 会话 id
+     * @return 会话
      */
-    void setAttribute(Channel channel, String name, Channel value);
-
+    Channel getChannel(String id);
     /**
-     * 根据用户名获取 channel
-     * @param channel 用户名
-     * @return channel
+     * 获取会话
+     * @param channel 会话
+     * @return 会话
      */
-    Channel getChannel(Channel channel);
+    String getId(Channel channel);
 
     /**
      * 获取容器中的个数

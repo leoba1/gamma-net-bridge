@@ -2,6 +2,7 @@ package com.bai.handler;
 
 import com.bai.message.Message;
 import com.bai.processor.ClientProcessor;
+import com.bai.session.SessionFactory;
 import com.bai.utils.ConfigReaderUtil;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -56,8 +57,16 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
                 break;
             case Message.TYPE_TRANSFER:
                 //处理数据传输逻辑
-                //TODO
-
+                Map<String, Object> metaData = message.getMetaData();
+                String visitorId = (String) metaData.get("visitorId");
+//                Channel localChannel = ClientProcessor.channelMap.get(visitorId);
+                Channel localChannel = SessionFactory.getSession().getChannel(visitorId);
+                if (localChannel == null) {
+                    log.info("本地连接不存在!");
+                    break;
+                }
+                byte[] data = message.getData();
+                localChannel.writeAndFlush(data);
                 break;
             case Message.TYPE_DISCONNECT:
                 //断开连接
@@ -65,8 +74,8 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
                 break;
             case Message.TYPE_ERROR:
                 //异常信息
-                Map<String, Object> metaData = message.getMetaData();
-                Throwable err = (Throwable) metaData.get(ERROR_MSG);
+                Map<String, Object> errMetaData = message.getMetaData();
+                Throwable err = (Throwable) errMetaData.get(ERROR_MSG);
                 log.info("服务端发送错误信息!");
                 err.printStackTrace();
                 break;
@@ -93,4 +102,5 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         super.exceptionCaught(ctx, cause);
     }
+
 }

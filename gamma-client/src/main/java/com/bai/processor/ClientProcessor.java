@@ -3,6 +3,7 @@ package com.bai.processor;
 import com.bai.client.ClientInit;
 import com.bai.handler.RealClientHandler;
 import com.bai.message.Message;
+import com.bai.session.SessionFactory;
 import com.bai.utils.ConfigReaderUtil;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -12,6 +13,7 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.bytes.ByteArrayDecoder;
 import io.netty.handler.codec.bytes.ByteArrayEncoder;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -24,8 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class ClientProcessor {
 
-    //visitorId与channel映射
-    public static ConcurrentHashMap<String, Channel> channelMap=new ConcurrentHashMap<>();
+    private Map<String, Channel> portMap = new HashMap<>();
 
     //本地监听服务器线程池
     private NioEventLoopGroup group = new NioEventLoopGroup();
@@ -39,22 +40,26 @@ public class ClientProcessor {
         List<String> ports = ConfigReaderUtil.ConfigReaders("client.port");
         Map<String, Object> metaData = message.getMetaData();
         String visitorId = (String) metaData.get("visitorId");
-        ports.forEach(port->{
+
+        for (String port : ports) {
+            if (portMap.containsKey(port)){
+                continue;
+            }
             ChannelInitializer<NioSocketChannel> channelInitializer= new ChannelInitializer<>() {
                 @Override
                 protected void initChannel(NioSocketChannel ch) throws Exception {
                     ch.pipeline().addLast(new ByteArrayEncoder());
                     ch.pipeline().addLast(new ByteArrayDecoder());
-                    ch.pipeline().addLast(new RealClientHandler());
+                    ch.pipeline().addLast(new RealClientHandler(ctx.channel()));
                 }
             };
             ClientInit clientInit=new ClientInit();
             String localHost = ConfigReaderUtil.ConfigReader("client.host");
-            int localPort = Integer.parseInt(ConfigReaderUtil.ConfigReader("client.port"));
-            clientInit.init(group,channelInitializer,localHost,localPort);
+            clientInit.init(group,channelInitializer,localHost,Integer.valueOf(port));
 
-            channelMap.put(visitorId,clientInit.getChannel());
-        });
+//            channelMap.put(visitorId,clientInit.getChannel());
+            SessionFactory.getSession().bind(clientInit.getChannel(),visitorId);
+            portMap.put(port,clientInit.getChannel());
+        }
     }
-
 }

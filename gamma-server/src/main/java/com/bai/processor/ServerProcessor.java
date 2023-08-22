@@ -11,6 +11,7 @@ import io.netty.channel.group.ChannelGroup;
 import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.codec.bytes.ByteArrayDecoder;
 import io.netty.handler.codec.bytes.ByteArrayEncoder;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
@@ -33,6 +34,8 @@ public class ServerProcessor {
     private final NioEventLoopGroup workerGroup = new NioEventLoopGroup();
     private final ChannelGroup proxyChannelGroup=new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
 
+    private ConcurrentHashMap<String,Channel> portMap=new ConcurrentHashMap<>();
+
     /**
      * 处理注册逻辑，开启对应的端口监听
      * @param ctx
@@ -47,19 +50,24 @@ public class ServerProcessor {
         List<String> ports =(List<String>) metaData.get("ports");
         String host = ConfigReaderUtil.ConfigReader("server.host");
 
-        ports.forEach(port->{
+        for (String port : ports) {
+            if (portMap.containsKey(port)){
+                continue;
+            }
+
             ChannelInitializer<NioSocketChannel> channelInitializer = new ChannelInitializer<>() {
                 @Override
                 protected void initChannel(NioSocketChannel ch) {
                     ch.pipeline().addLast(new LoggingHandler(LogLevel.DEBUG));
                     ch.pipeline().addLast(new ByteArrayEncoder());
-                    ch.pipeline().addLast(new ByteArrayEncoder());
-                    ch.pipeline().addLast(new ProxyServerHandler(bossGroup,workerGroup,proxyChannelGroup,ctx.channel()));
+                    ch.pipeline().addLast(new ByteArrayDecoder());
+                    ch.pipeline().addLast(new ProxyServerHandler(bossGroup, workerGroup, proxyChannelGroup, ctx.channel()));
                 }
             };
-            ServerInit serverInit=new ServerInit();
+            ServerInit serverInit = new ServerInit();
             serverInit.init(bossGroup, workerGroup, channelInitializer, host, Integer.parseInt(port));
-        });
+            portMap.put(port,serverInit.getChannel());
+        }
     }
 
 }

@@ -23,7 +23,7 @@ import static com.bai.constants.Constants.ERROR_MSG;
 @Slf4j
 public class ServerHandler extends ChannelInboundHandlerAdapter {
     //visitorId和channel的映射
-    public static ConcurrentHashMap<String, Channel> channelMap=new ConcurrentHashMap<>();
+    public static ConcurrentHashMap<String, Channel> channelMap = new ConcurrentHashMap<>();
     private static ServerProcessor serverProcessor = new ServerProcessor();
     //是否注册
     private boolean isReg = false;
@@ -46,11 +46,31 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
         Message message = (Message) msg;
         byte type = message.getType();
         if (isReg) {//已经注册了
-            //处理消息转发逻辑
-            //TODO
+            switch (type) {
+                case Message.TYPE_TRANSFER:
+                    //处理数据传输逻辑
+                    //TODO
+                    break;
+                case Message.TYPE_DISCONNECT:
+                    //处理断开连接逻辑
+                    ctx.channel().close();
+                    break;
+                case Message.TYPE_HEARTBEAT:
+                    //不处理心跳
+                    break;
+                case Message.TYPE_ERROR:
+                    //处理错误逻辑
+                    Throwable cause =(Throwable) message.getMetaData().get(ERROR_MSG);
+                    cause.printStackTrace();
+                    break;
+                default:
+                    //未知消息类型
+                    log.info("未知消息类型!");
+                    ctx.channel().close();
+                    break;
+            }
         } else if (type == Message.REG) {
             //处理注册逻辑
-//            ServerProcessor.getInstance().ProcessReg(ctx,message);
             serverProcessor.ProcessReg(ctx, message);
             //注册成功
             Message confirmMessage = new Message();
