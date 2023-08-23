@@ -1,6 +1,7 @@
 package com.bai.handler;
 
 import com.bai.message.Message;
+import com.bai.processor.ServerProcessor;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -9,7 +10,13 @@ import io.netty.channel.group.ChannelGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import lombok.extern.slf4j.Slf4j;
 
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.util.HashMap;
+
+import static com.bai.constants.Constants.FROM;
+import static com.bai.constants.Constants.TO;
 
 /**
  * 反向代理处理器，处理外部发出来的请求
@@ -25,6 +32,7 @@ public class ProxyServerHandler extends ChannelInboundHandlerAdapter {
     private ChannelGroup proxyChannelGroup;
     private NioEventLoopGroup bossGroup;
     private NioEventLoopGroup workerGroup;
+    private Integer port;
 
     public ProxyServerHandler(NioEventLoopGroup bossGroup, NioEventLoopGroup workerGroup,
                               ChannelGroup proxyChannelGroup, Channel serverChannel) {
@@ -38,13 +46,15 @@ public class ProxyServerHandler extends ChannelInboundHandlerAdapter {
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         ServerHandler.channelMap.put(ctx.channel().id().asLongText(), ctx.channel());
         proxyChannelGroup.add(ctx.channel());
-        //有请求过来，开启本地客户端连接
-        Message message = new Message();
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("visitorId", ctx.channel().id().asLongText());
-        message.setMetaData(map);
-        message.setType(Message.TYPE_CONNECT);
-        serverChannel.writeAndFlush(message);
+//        //有请求过来，开启本地客户端连接
+//        Message message = new Message();
+//        HashMap<String, Object> map = new HashMap<>(5,0.8f);
+//        map.put("visitorId", ctx.channel().id().asLongText());
+//        message.setMetaData(map);
+//        message.setType(Message.TYPE_CONNECT);
+//        serverChannel.writeAndFlush(message);
+        InetSocketAddress inetSocketAddress = (InetSocketAddress) ctx.channel().localAddress();
+        this.port = inetSocketAddress.getPort();
     }
 
     @Override
@@ -57,8 +67,10 @@ public class ProxyServerHandler extends ChannelInboundHandlerAdapter {
         Message message = new Message();
         message.setType(Message.TYPE_TRANSFER);
         message.setData(data);
-        HashMap<String, Object> map = new HashMap<>();
+        HashMap<String, Object> map = new HashMap<>(5,0.8f);
         map.put("visitorId", ctx.channel().id().asLongText());
+        map.put(FROM,port);
+        map.put(TO, ServerProcessor.portMap.get(port));
         message.setMetaData(map);
         serverChannel.writeAndFlush(message);
 

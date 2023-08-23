@@ -33,8 +33,8 @@ public class ServerProcessor {
     private final NioEventLoopGroup bossGroup = new NioEventLoopGroup();
     private final NioEventLoopGroup workerGroup = new NioEventLoopGroup();
     private final ChannelGroup proxyChannelGroup=new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
-
-    private ConcurrentHashMap<String,Channel> portMap=new ConcurrentHashMap<>();
+    private final Map<Integer,Channel> portChannelMap=new ConcurrentHashMap<>(6,0.8f,4);;
+    public final static Map<Integer,Integer> portMap=new ConcurrentHashMap<>(6,0.8f,4);;
 
     /**
      * 处理注册逻辑，开启对应的端口监听
@@ -46,12 +46,18 @@ public class ServerProcessor {
         String token= (String)metaData.get("token");
         //TODO 校验token
 
+        List<Integer> clients =(List<Integer>) metaData.get("clients");
         //启动对应的端口监听
-        List<String> ports =(List<String>) metaData.get("ports");
+        List<Integer> visitors =(List<Integer>) metaData.get("visitors");
+
+        for (int i = 0; i < clients.size(); i++) {
+            portMap.put(visitors.get(i),clients.get(i));
+        }
+
         String host = ConfigReaderUtil.ConfigReader("server.host");
 
-        for (String port : ports) {
-            if (portMap.containsKey(port)){
+        for (int visitor : visitors) {
+            if (portChannelMap.containsKey(visitor)){
                 continue;
             }
 
@@ -65,8 +71,8 @@ public class ServerProcessor {
                 }
             };
             ServerInit serverInit = new ServerInit();
-            serverInit.init(bossGroup, workerGroup, channelInitializer, host, Integer.parseInt(port));
-            portMap.put(port,serverInit.getChannel());
+            serverInit.init(bossGroup, workerGroup, channelInitializer, host, visitor);
+            portChannelMap.put(visitor,serverInit.getChannel());
         }
     }
 

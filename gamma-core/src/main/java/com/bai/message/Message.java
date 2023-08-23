@@ -20,9 +20,6 @@ public class Message {
     /** 心跳 */
     public static final byte TYPE_HEARTBEAT = 0X00;
 
-    /** 连接 */
-    public static final byte TYPE_CONNECT = 0X01;
-
     /** 数据传输 */
     public static final byte TYPE_TRANSFER = 0X02;
 

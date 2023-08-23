@@ -9,12 +9,13 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static com.bai.constants.Constants.ERROR_MSG;
+import static com.bai.constants.Constants.*;
 
 /**
  * @author bzh
@@ -26,16 +27,31 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
 
     private static ClientProcessor clientProcessor = new ClientProcessor();
 
-
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         Message message = new Message();
         //发送注册消息
         message.setType(Message.REG);
         //将本地的端口映射信息发送给服务器
-        List<String> ports = ConfigReaderUtil.ConfigReaders("visitor.port");
-        HashMap<String, Object> portsMapping = new HashMap<>();
-        portsMapping.put("ports", ports);
+        List<String> visitorsStr = ConfigReaderUtil.ConfigReaders("visitor.port");
+        List<String> clientsStr = ConfigReaderUtil.ConfigReaders("client.port");
+
+        List<Integer> visitors=new ArrayList<>();
+        List<Integer> clients=new ArrayList<>();
+        for (int i = 0; i < visitorsStr.size(); i++) {
+            visitors.add(Integer.valueOf(visitorsStr.get(i)));
+        }
+        for (int i = 0; i < clientsStr.size(); i++) {
+            clients.add(Integer.valueOf(clientsStr.get(i)));
+        }
+        if (visitors.size() != clients.size()) {
+            log.info("配置文件错误!");
+            ctx.channel().close();
+            return;
+        }
+        HashMap<String, Object> portsMapping = new HashMap<>(5,0.8f);
+        portsMapping.put("visitors", visitors);
+        portsMapping.put("clients", clients);
         //发送token验证信息
         String token = ConfigReaderUtil.ConfigReader("token");
         portsMapping.put("token", token);
@@ -50,17 +66,20 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
         Message message = (Message) msg;
         byte type = message.getType();
         switch (type) {
-            case Message.TYPE_CONNECT:
+            case Message.CONFIRM:
                 //开启本地端口监听
                 clientProcessor.doConnect(ctx,message);
-
                 break;
             case Message.TYPE_TRANSFER:
                 //处理数据传输逻辑
                 Map<String, Object> metaData = message.getMetaData();
                 String visitorId = (String) metaData.get("visitorId");
-//                Channel localChannel = ClientProcessor.channelMap.get(visitorId);
-                Channel localChannel = SessionFactory.getSession().getChannel(visitorId);
+                int fromPort =(int) metaData.get(FROM);
+                int toPort = (int) metaData.get(TO);
+
+                Channel localChannel = ClientProcessor.portChannelMap.get(String.valueOf(toPort));
+
+//                Channel localChannel = SessionFactory.getSession().getChannel(visitorId);
                 if (localChannel == null) {
                     log.info("本地连接不存在!");
                     break;
@@ -81,10 +100,6 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
                 break;
             case Message.TYPE_HEARTBEAT:
                 //心跳,不处理
-                break;
-            case Message.CONFIRM:
-                //注册确认
-                log.info("注册成功!");
                 break;
             default:
                 //非法请求

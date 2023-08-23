@@ -9,8 +9,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * Create Time:2023/6/23 16:39
  */
 public class SessionMemory implements Session{
-    private final ConcurrentHashMap<String,Channel> SC = new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<Channel,String> CS = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String,Channel> SC = new ConcurrentHashMap<>(6,0.8f,4);;
+    private final ConcurrentHashMap<Channel,String> CS = new ConcurrentHashMap<>(6,0.8f,4);;
 
     @Override
     public void bind(Channel channel, String visitorId) {

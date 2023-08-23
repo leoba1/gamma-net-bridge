@@ -23,7 +23,7 @@ import static com.bai.constants.Constants.ERROR_MSG;
 @Slf4j
 public class ServerHandler extends ChannelInboundHandlerAdapter {
     //visitorId和channel的映射
-    public static ConcurrentHashMap<String, Channel> channelMap = new ConcurrentHashMap<>();
+    public static ConcurrentHashMap<String, Channel> channelMap = new ConcurrentHashMap<>(6,0.8f,4);;
     private static ServerProcessor serverProcessor = new ServerProcessor();
     //是否注册
     private boolean isReg = false;
@@ -96,7 +96,7 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         Message message = new Message();
         message.setType(Message.TYPE_ERROR);
-        HashMap<String, Object> map = new HashMap<>();
+        HashMap<String, Object> map = new HashMap<>(5,0.8f);
         map.put(ERROR_MSG, cause);
         message.setMetaData(map);
         ctx.channel().writeAndFlush(message);

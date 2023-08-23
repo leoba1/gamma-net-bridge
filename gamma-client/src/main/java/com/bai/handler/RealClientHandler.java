@@ -6,6 +6,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import lombok.extern.slf4j.Slf4j;
 
+import java.net.InetSocketAddress;
 import java.util.HashMap;
 
 /**
@@ -18,6 +19,7 @@ import java.util.HashMap;
 public class RealClientHandler extends ChannelInboundHandlerAdapter {
 
     private Channel clientChannel;
+    private int port;
 
     public RealClientHandler(Channel channel) {
         this.clientChannel = channel;
@@ -26,6 +28,8 @@ public class RealClientHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         log.info("本地客户端连接成功:"+ctx.channel().remoteAddress());
+        InetSocketAddress inetSocketAddress = (InetSocketAddress) ctx.channel().localAddress();
+        this.port = inetSocketAddress.getPort();
     }
 
     @Override
@@ -35,8 +39,8 @@ public class RealClientHandler extends ChannelInboundHandlerAdapter {
         Message dataMessage = new Message();
         dataMessage.setType(Message.TYPE_TRANSFER);
         dataMessage.setData(data);
-        HashMap<String,Object> metaData=new HashMap<>();
-        metaData.put("visitorId",clientChannel.id().asLongText());
+        HashMap<String,Object> metaData=new HashMap<>(5,0.8f);
+//        metaData.put("visitorId",clientChannel.id().asLongText());
 
     }
 

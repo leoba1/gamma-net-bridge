@@ -28,9 +28,14 @@ public class TestHttp {
             serverBootstrap.childHandler(new ChannelInitializer<SocketChannel>() {
                 @Override
                 protected void initChannel(SocketChannel ch) throws Exception {
-                    ch.pipeline().addLast(new LoggingHandler(LogLevel.INFO));
+//                    ch.pipeline().addLast(new LoggingHandler(LogLevel.INFO));
                     ch.pipeline().addLast(new HttpServerCodec());//Http编解码器
                     ch.pipeline().addLast(new SimpleChannelInboundHandler<HttpRequest>() {
+                        @Override
+                        public void channelActive(ChannelHandlerContext ctx) throws Exception {
+                            System.out.println(ctx.channel().id().asLongText());
+                        }
+
                         @Override
                         protected void channelRead0(ChannelHandlerContext ctx, HttpRequest msg) throws Exception {
                             log.debug("请求：{}",msg.uri());

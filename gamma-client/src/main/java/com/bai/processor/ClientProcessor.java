@@ -26,7 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class ClientProcessor {
 
-    private Map<String, Channel> portMap = new HashMap<>();
+    public static final Map<String, Channel> portChannelMap = new ConcurrentHashMap<>(6,0.8f,4);;
 
     //本地监听服务器线程池
     private NioEventLoopGroup group = new NioEventLoopGroup();
@@ -42,7 +42,7 @@ public class ClientProcessor {
         String visitorId = (String) metaData.get("visitorId");
 
         for (String port : ports) {
-            if (portMap.containsKey(port)){
+            if (portChannelMap.containsKey(port)){
                 continue;
             }
             ChannelInitializer<NioSocketChannel> channelInitializer= new ChannelInitializer<>() {
@@ -59,7 +59,7 @@ public class ClientProcessor {
 
 //            channelMap.put(visitorId,clientInit.getChannel());
             SessionFactory.getSession().bind(clientInit.getChannel(),visitorId);
-            portMap.put(port,clientInit.getChannel());
+            portChannelMap.put(port,clientInit.getChannel());
         }
     }
 }
