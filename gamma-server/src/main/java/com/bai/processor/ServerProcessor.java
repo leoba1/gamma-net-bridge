@@ -1,6 +1,7 @@
 package com.bai.processor;
 
 import com.bai.handler.ProxyServerHandler;
+import com.bai.handler.ServerHandler;
 import com.bai.message.Message;
 import com.bai.server.ServerInit;
 import com.bai.utils.ConfigReaderUtil;
@@ -76,4 +77,19 @@ public class ServerProcessor {
         }
     }
 
+    /**
+     * 处理数据传输逻辑
+     * @param ctx ctx
+     * @param message 消息
+     */
+    public void ProcessTransfer(ChannelHandlerContext ctx, Message message) {
+        Map<String, Object> metaData = message.getMetaData();
+        String visitorId = (String) metaData.get("visitorId");
+        Channel proxyChannel = ServerHandler.channelMap.get(visitorId);
+        if (proxyChannel == null) {
+            throw new IllegalArgumentException("channel不存在!");
+        }
+        byte[] data = message.getData();
+        proxyChannel.writeAndFlush(data);
+    }
 }

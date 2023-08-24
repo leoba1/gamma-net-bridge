@@ -23,7 +23,7 @@ import static com.bai.constants.Constants.ERROR_MSG;
 @Slf4j
 public class ServerHandler extends ChannelInboundHandlerAdapter {
     //visitorId和channel的映射
-    public static ConcurrentHashMap<String, Channel> channelMap = new ConcurrentHashMap<>(6,0.8f,4);;
+    public static ConcurrentHashMap<String, Channel> channelMap = new ConcurrentHashMap<>(8, 0.8f, 4);
     private static ServerProcessor serverProcessor = new ServerProcessor();
     //是否注册
     private boolean isReg = false;
@@ -49,7 +49,7 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
             switch (type) {
                 case Message.TYPE_TRANSFER:
                     //处理数据传输逻辑
-                    //TODO
+                    serverProcessor.ProcessTransfer(ctx, message);
                     break;
                 case Message.TYPE_DISCONNECT:
                     //处理断开连接逻辑
@@ -60,9 +60,12 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
                     break;
                 case Message.TYPE_ERROR:
                     //处理错误逻辑
-                    Throwable cause =(Throwable) message.getMetaData().get(ERROR_MSG);
+                    Throwable cause = (Throwable) message.getMetaData().get(ERROR_MSG);
                     cause.printStackTrace();
                     break;
+//                case Message.TYPE_CONNECT:
+//
+//                    break;
                 default:
                     //未知消息类型
                     log.info("未知消息类型!");
@@ -96,7 +99,7 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         Message message = new Message();
         message.setType(Message.TYPE_ERROR);
-        HashMap<String, Object> map = new HashMap<>(5,0.8f);
+        HashMap<String, Object> map = new HashMap<>(5, 0.8f);
         map.put(ERROR_MSG, cause);
         message.setMetaData(map);
         ctx.channel().writeAndFlush(message);

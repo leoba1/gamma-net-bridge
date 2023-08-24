@@ -1,6 +1,7 @@
 package com.bai.handler;
 
 import com.bai.message.Message;
+import com.bai.session.SessionFactory;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -37,11 +38,13 @@ public class RealClientHandler extends ChannelInboundHandlerAdapter {
         //接受到本地服务的响应，准备发送给服务器
         byte[] data = (byte[]) msg;
         Message dataMessage = new Message();
+        String visitorId = SessionFactory.getSession().getId(ctx.channel());
         dataMessage.setType(Message.TYPE_TRANSFER);
         dataMessage.setData(data);
-        HashMap<String,Object> metaData=new HashMap<>(5,0.8f);
-//        metaData.put("visitorId",clientChannel.id().asLongText());
-
+        HashMap<String,Object> metaData=new HashMap<>(2,1f);
+        metaData.put("visitorId",visitorId);
+        dataMessage.setMetaData(metaData);
+        clientChannel.writeAndFlush(dataMessage);
     }
 
     @Override

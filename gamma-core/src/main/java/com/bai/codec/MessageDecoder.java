@@ -39,7 +39,7 @@ public class MessageDecoder extends LengthFieldBasedFrameDecoder {
     }
 
     public MessageDecoder() {
-        super(Integer.MAX_VALUE, 6, 4, 0, 0);
+        super(2 << 20, 6, 4, 0, 0);
     }
 
 

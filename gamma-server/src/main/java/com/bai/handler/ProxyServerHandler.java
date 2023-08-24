@@ -46,20 +46,22 @@ public class ProxyServerHandler extends ChannelInboundHandlerAdapter {
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         ServerHandler.channelMap.put(ctx.channel().id().asLongText(), ctx.channel());
         proxyChannelGroup.add(ctx.channel());
-//        //有请求过来，开启本地客户端连接
-//        Message message = new Message();
-//        HashMap<String, Object> map = new HashMap<>(5,0.8f);
-//        map.put("visitorId", ctx.channel().id().asLongText());
-//        message.setMetaData(map);
-//        message.setType(Message.TYPE_CONNECT);
-//        serverChannel.writeAndFlush(message);
+        //有请求过来，开启本地客户端连接
+        Message message = new Message();
+        HashMap<String, Object> map = new HashMap<>(5, 0.8f);
+        map.put(FROM, port);
+        map.put(TO, ServerProcessor.portMap.get(port));
+        map.put("visitorId", ctx.channel().id().asLongText());
+        message.setMetaData(map);
+        message.setType(Message.TYPE_CONNECT);
+        serverChannel.writeAndFlush(message);
         InetSocketAddress inetSocketAddress = (InetSocketAddress) ctx.channel().localAddress();
         this.port = inetSocketAddress.getPort();
     }
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        if (msg == null || ctx==null){
+        if (msg == null || ctx == null) {
             return;
         }
         //接受到外部的请求
@@ -67,10 +69,10 @@ public class ProxyServerHandler extends ChannelInboundHandlerAdapter {
         Message message = new Message();
         message.setType(Message.TYPE_TRANSFER);
         message.setData(data);
-        HashMap<String, Object> map = new HashMap<>(5,0.8f);
+        HashMap<String, Object> map = new HashMap<>(5, 0.8f);
         map.put("visitorId", ctx.channel().id().asLongText());
-        map.put(FROM,port);
-        map.put(TO, ServerProcessor.portMap.get(port));
+//        map.put(FROM,port);
+//        map.put(TO, ServerProcessor.portMap.get(port));
         message.setMetaData(map);
         serverChannel.writeAndFlush(message);
 

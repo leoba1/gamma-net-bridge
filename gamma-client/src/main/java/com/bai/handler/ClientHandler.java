@@ -36,8 +36,8 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
         List<String> visitorsStr = ConfigReaderUtil.ConfigReaders("visitor.port");
         List<String> clientsStr = ConfigReaderUtil.ConfigReaders("client.port");
 
-        List<Integer> visitors=new ArrayList<>();
-        List<Integer> clients=new ArrayList<>();
+        List<Integer> visitors = new ArrayList<>();
+        List<Integer> clients = new ArrayList<>();
         for (int i = 0; i < visitorsStr.size(); i++) {
             visitors.add(Integer.valueOf(visitorsStr.get(i)));
         }
@@ -49,7 +49,7 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
             ctx.channel().close();
             return;
         }
-        HashMap<String, Object> portsMapping = new HashMap<>(5,0.8f);
+        HashMap<String, Object> portsMapping = new HashMap<>(5, 0.8f);
         portsMapping.put("visitors", visitors);
         portsMapping.put("clients", clients);
         //发送token验证信息
@@ -67,19 +67,18 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
         byte type = message.getType();
         switch (type) {
             case Message.CONFIRM:
-                //开启本地端口监听
-                clientProcessor.doConnect(ctx,message);
+                log.info("连接成功!");
                 break;
             case Message.TYPE_TRANSFER:
                 //处理数据传输逻辑
                 Map<String, Object> metaData = message.getMetaData();
                 String visitorId = (String) metaData.get("visitorId");
-                int fromPort =(int) metaData.get(FROM);
-                int toPort = (int) metaData.get(TO);
+//                int fromPort = (int) metaData.get(FROM);
+//                int toPort = (int) metaData.get(TO);
 
-                Channel localChannel = ClientProcessor.portChannelMap.get(String.valueOf(toPort));
+//                Channel localChannel = ClientProcessor.portChannelMap.get(String.valueOf(toPort));
 
-//                Channel localChannel = SessionFactory.getSession().getChannel(visitorId);
+                Channel localChannel = SessionFactory.getSession().getChannel(visitorId);
                 if (localChannel == null) {
                     log.info("本地连接不存在!");
                     break;
@@ -90,6 +89,10 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
             case Message.TYPE_DISCONNECT:
                 //断开连接
                 ctx.channel().close();
+                break;
+            case Message.TYPE_CONNECT:
+                //开启本地端口监听
+                clientProcessor.doConnect(ctx, message);
                 break;
             case Message.TYPE_ERROR:
                 //异常信息

@@ -26,6 +26,9 @@ public class Message {
     /** 连接断开 */
     public static final byte TYPE_DISCONNECT = 0X09;
 
+    /** 连接 */
+    public static final byte TYPE_CONNECT = 0X01;
+
     /** 通用异常信息 */
     public static final byte TYPE_ERROR = 0x06;
 
