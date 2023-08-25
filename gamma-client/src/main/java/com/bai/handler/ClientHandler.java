@@ -29,6 +29,7 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
+        log.debug("ttt,{}",ctx.channel().id().asLongText());
         Message message = new Message();
         //发送注册消息
         message.setType(Message.REG);

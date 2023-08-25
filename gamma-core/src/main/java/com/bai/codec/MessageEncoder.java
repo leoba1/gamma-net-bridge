@@ -1,6 +1,7 @@
 package com.bai.codec;
 
 import com.bai.message.Message;
+import com.bai.utils.ByteBufUtils;
 import io.netty.buffer.ByteBuf;
 import cn.hutool.json.JSONUtil;
 import io.netty.channel.ChannelHandlerContext;
@@ -8,7 +9,6 @@ import io.netty.handler.codec.MessageToByteEncoder;
 import lombok.extern.slf4j.Slf4j;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Map;
 
 import static com.bai.constants.Constants.MAGIC_NUM;
 
@@ -31,7 +31,8 @@ public class MessageEncoder extends MessageToByteEncoder<Message> {
         out.writeByte(msg.getType());
         //版本号1
         out.writeByte(2);
-
+        //log
+        ByteBufUtils.bufLog(out);
 
         if (msg.getMetaData() == null || msg.getMetaData().isEmpty()) {
             //元数据长度4
@@ -45,8 +46,8 @@ public class MessageEncoder extends MessageToByteEncoder<Message> {
                 out.writeBytes(jsonStr.getBytes(StandardCharsets.UTF_8));
             }
         }
-
-
+        //log
+        ByteBufUtils.bufLog(out);
         if (msg.getData() == null || msg.getData().length == 0) {
             //消息长度4
             out.writeInt(0);
@@ -58,5 +59,7 @@ public class MessageEncoder extends MessageToByteEncoder<Message> {
                 out.writeBytes(msg.getData());
             }
         }
+        //log
+        ByteBufUtils.bufLog(out);
     }
 }

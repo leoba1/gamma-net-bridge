@@ -37,6 +37,7 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
+        log.debug("ttt,{}",ctx.channel().id().asLongText());
         log.info("有新的连接:" + ctx.channel().remoteAddress());
         serverChannelGroup.add(ctx.channel());
     }

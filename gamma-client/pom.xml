@@ -18,7 +18,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>2.5.4</version>
                 <configuration>
-                    <mainClass>com.bai.ClientApp</mainClass>
+                    <mainClass>com.bai.ClientApplication</mainClass>
                 </configuration>
                 <executions>
                     <execution>

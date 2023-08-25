@@ -25,23 +25,27 @@ public class ClientStarter extends Container {
 
     @Override
     public void start() {
-        ChannelInitializer channelInitializer = new ChannelInitializer<NioSocketChannel>() {
-            @Override
-            protected void initChannel(NioSocketChannel ch) throws Exception {
+        try {
+            ChannelInitializer channelInitializer = new ChannelInitializer<NioSocketChannel>() {
+                @Override
+                protected void initChannel(NioSocketChannel ch) throws Exception {
 
-                ch.pipeline().addLast(new LoggingHandler(LogLevel.DEBUG));
-                ch.pipeline().addLast(new MessageDecoder());
-                ch.pipeline().addLast(new MessageEncoder());
-                ch.pipeline().addLast(new ClientHandler());
-//                ch.pipeline().addLast(new HeartBeatHandler(HeartBeatHandler.READ_IDLE_TIME,HeartBeatHandler.WRITE_IDLE_TIME-5));
+                    ch.pipeline().addLast(new LoggingHandler(LogLevel.DEBUG));
+                    ch.pipeline().addLast(new MessageDecoder());
+                    ch.pipeline().addLast(new MessageEncoder());
+                    ch.pipeline().addLast(new ClientHandler());
+    //                ch.pipeline().addLast(new HeartBeatHandler(HeartBeatHandler.READ_IDLE_TIME,HeartBeatHandler.WRITE_IDLE_TIME-5));
 
-            }
-        };
+                }
+            };
 
-        ClientInit clientInit = new ClientInit();
-        String host = ConfigReaderUtil.ConfigReader("server.host");
-        int port = Integer.parseInt(ConfigReaderUtil.ConfigReader("server.port"));
-        clientInit.init(group, channelInitializer, host, port);
+            ClientInit clientInit = new ClientInit();
+            String host = ConfigReaderUtil.ConfigReader("server.host");
+            int port = Integer.parseInt(ConfigReaderUtil.ConfigReader("server.port"));
+            clientInit.init(group, channelInitializer, host, port);
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

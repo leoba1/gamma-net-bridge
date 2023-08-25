@@ -33,6 +33,7 @@ public class TestHttp {
                     ch.pipeline().addLast(new SimpleChannelInboundHandler<HttpRequest>() {
                         @Override
                         public void channelActive(ChannelHandlerContext ctx) throws Exception {
+                            log.debug("ttt,{}",ctx.channel().id().asLongText());
                             System.out.println(ctx.channel().id().asLongText());
                         }
 

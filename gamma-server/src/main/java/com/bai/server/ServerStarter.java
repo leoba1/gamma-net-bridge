@@ -27,23 +27,27 @@ public class ServerStarter extends Container {
 
     @Override
     public void start() {
-        ChannelInitializer channelInitializer = new ChannelInitializer<NioSocketChannel>() {
-            @Override
-            protected void initChannel(NioSocketChannel ch) throws Exception {
+        try {
+            ChannelInitializer channelInitializer = new ChannelInitializer<NioSocketChannel>() {
+                @Override
+                protected void initChannel(NioSocketChannel ch) throws Exception {
 
-                ch.pipeline().addLast(new LoggingHandler(LogLevel.DEBUG));
-                ch.pipeline().addLast(new MessageDecoder());
-                ch.pipeline().addLast(new MessageEncoder());
-                ch.pipeline().addLast(new ServerHandler(channelGroup));
-//                ch.pipeline().addLast(new HeartBeatHandler(HeartBeatHandler.READ_IDLE_TIME, HeartBeatHandler.WRITE_IDLE_TIME));
+                    ch.pipeline().addLast(new LoggingHandler(LogLevel.DEBUG));
+                    ch.pipeline().addLast(new MessageDecoder());
+                    ch.pipeline().addLast(new MessageEncoder());
+                    ch.pipeline().addLast(new ServerHandler(channelGroup));
+    //                ch.pipeline().addLast(new HeartBeatHandler(HeartBeatHandler.READ_IDLE_TIME, HeartBeatHandler.WRITE_IDLE_TIME));
 
-            }
-        };
+                }
+            };
 
-        ServerInit serverInit = new ServerInit();
-        String host = ConfigReaderUtil.ConfigReader("server.host");
-        int port = Integer.parseInt(ConfigReaderUtil.ConfigReader("server.port"));
-        serverInit.init(boosGroup, workerGroup, channelInitializer, host, port);
+            ServerInit serverInit = new ServerInit();
+            String host = ConfigReaderUtil.ConfigReader("server.host");
+            int port = Integer.parseInt(ConfigReaderUtil.ConfigReader("server.port"));
+            serverInit.init(boosGroup, workerGroup, channelInitializer, host, port);
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+        }
 
     }
 

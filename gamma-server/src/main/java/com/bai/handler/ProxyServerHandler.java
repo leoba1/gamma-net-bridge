@@ -44,13 +44,15 @@ public class ProxyServerHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
+        log.debug("有客户端连接到代理服务器,id为:{}", ctx.channel().id().asLongText());
+
         ServerHandler.channelMap.put(ctx.channel().id().asLongText(), ctx.channel());
         proxyChannelGroup.add(ctx.channel());
         //有请求过来，开启本地客户端连接
         Message message = new Message();
         HashMap<String, Object> map = new HashMap<>(5, 0.8f);
-        map.put(FROM, port);
-        map.put(TO, ServerProcessor.portMap.get(port));
+//        map.put(FROM, port);
+//        map.put(TO, ServerProcessor.portMap.get(port));
         map.put("visitorId", ctx.channel().id().asLongText());
         message.setMetaData(map);
         message.setType(Message.TYPE_CONNECT);
@@ -78,26 +80,26 @@ public class ProxyServerHandler extends ChannelInboundHandlerAdapter {
 
     }
 
-    @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        ServerHandler.channelMap.remove(ctx.channel().id().asLongText());
-        ctx.channel().close();
-        proxyChannelGroup.remove(ctx.channel());
-        if (proxyChannelGroup.isEmpty()) {
-            serverChannel.close();
-            bossGroup.shutdownGracefully();
-            workerGroup.shutdownGracefully();
-        }
-    }
-
-    @Override
-    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        ServerHandler.channelMap.remove(ctx.channel().id().asLongText());
-        proxyChannelGroup.remove(ctx.channel());
-        if (proxyChannelGroup.isEmpty()) {
-            serverChannel.close();
-            bossGroup.shutdownGracefully();
-            workerGroup.shutdownGracefully();
-        }
-    }
+//    @Override
+//    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+//        ServerHandler.channelMap.remove(ctx.channel().id().asLongText());
+//        ctx.channel().close();
+//        proxyChannelGroup.remove(ctx.channel());
+//        if (proxyChannelGroup.isEmpty()) {
+//            serverChannel.close();
+//            bossGroup.shutdownGracefully();
+//            workerGroup.shutdownGracefully();
+//        }
+//    }
+//
+//    @Override
+//    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+//        ServerHandler.channelMap.remove(ctx.channel().id().asLongText());
+//        proxyChannelGroup.remove(ctx.channel());
+//        if (proxyChannelGroup.isEmpty()) {
+//            serverChannel.close();
+//            bossGroup.shutdownGracefully();
+//            workerGroup.shutdownGracefully();
+//        }
+//    }
 }

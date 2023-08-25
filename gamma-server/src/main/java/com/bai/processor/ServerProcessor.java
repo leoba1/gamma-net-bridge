@@ -57,23 +57,27 @@ public class ServerProcessor {
 
         String host = ConfigReaderUtil.ConfigReader("server.host");
 
-        for (int visitor : visitors) {
-            if (portChannelMap.containsKey(visitor)){
-                continue;
-            }
-
-            ChannelInitializer<NioSocketChannel> channelInitializer = new ChannelInitializer<>() {
-                @Override
-                protected void initChannel(NioSocketChannel ch) {
-                    ch.pipeline().addLast(new LoggingHandler(LogLevel.DEBUG));
-                    ch.pipeline().addLast(new ByteArrayEncoder());
-                    ch.pipeline().addLast(new ByteArrayDecoder());
-                    ch.pipeline().addLast(new ProxyServerHandler(bossGroup, workerGroup, proxyChannelGroup, ctx.channel()));
+        try {
+            for (int visitor : visitors) {
+                if (portChannelMap.containsKey(visitor)){
+                    continue;
                 }
-            };
-            ServerInit serverInit = new ServerInit();
-            serverInit.init(bossGroup, workerGroup, channelInitializer, host, visitor);
-            portChannelMap.put(visitor,serverInit.getChannel());
+
+                ChannelInitializer<NioSocketChannel> channelInitializer = new ChannelInitializer<>() {
+                    @Override
+                    protected void initChannel(NioSocketChannel ch) {
+                        ch.pipeline().addLast(new LoggingHandler(LogLevel.DEBUG));
+                        ch.pipeline().addLast(new ByteArrayEncoder());
+                        ch.pipeline().addLast(new ByteArrayDecoder());
+                        ch.pipeline().addLast(new ProxyServerHandler(bossGroup, workerGroup, proxyChannelGroup, ctx.channel()));
+                    }
+                };
+                ServerInit serverInit = new ServerInit();
+                serverInit.init(bossGroup, workerGroup, channelInitializer, host, visitor);
+                portChannelMap.put(visitor,serverInit.getChannel());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

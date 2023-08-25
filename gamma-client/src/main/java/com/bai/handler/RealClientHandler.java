@@ -28,6 +28,7 @@ public class RealClientHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
+        log.debug("ttt,{}",ctx.channel().id().asLongText());
         log.info("本地客户端连接成功:"+ctx.channel().remoteAddress());
         InetSocketAddress inetSocketAddress = (InetSocketAddress) ctx.channel().localAddress();
         this.port = inetSocketAddress.getPort();
