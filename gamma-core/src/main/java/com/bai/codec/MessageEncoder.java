@@ -32,7 +32,7 @@ public class MessageEncoder extends MessageToByteEncoder<Message> {
         //版本号1
         out.writeByte(2);
         //log
-        ByteBufUtils.bufLog(out);
+//        ByteBufUtils.bufLog(out);
 
         if (msg.getMetaData() == null || msg.getMetaData().isEmpty()) {
             //元数据长度4
@@ -47,7 +47,7 @@ public class MessageEncoder extends MessageToByteEncoder<Message> {
             }
         }
         //log
-        ByteBufUtils.bufLog(out);
+//        ByteBufUtils.bufLog(out);
         if (msg.getData() == null || msg.getData().length == 0) {
             //消息长度4
             out.writeInt(0);
@@ -60,6 +60,6 @@ public class MessageEncoder extends MessageToByteEncoder<Message> {
             }
         }
         //log
-        ByteBufUtils.bufLog(out);
+//        ByteBufUtils.bufLog(out);
     }
 }

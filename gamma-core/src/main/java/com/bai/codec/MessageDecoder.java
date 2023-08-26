@@ -24,14 +24,14 @@ import static com.bai.constants.Constants.MAGIC_NUM;
 public class MessageDecoder extends LengthFieldBasedFrameDecoder {
 
 
-
     /**
      * 帧解码器，消息长度不足会等待一会
-     *  @Param maxFrameLength 最大帧长度
-     *  @Param lengthFieldOffset 长度字段位移量
-     *  @Param lengthFieldLength 长度字段的长度
-     *  @Param lengthAdjustment 长度调整
-     *  @Param initialBytesToStrip 剥离字节数
+     *
+     * @Param maxFrameLength 最大帧长度
+     * @Param lengthFieldOffset 长度字段位移量
+     * @Param lengthFieldLength 长度字段的长度
+     * @Param lengthAdjustment 长度调整
+     * @Param initialBytesToStrip 剥离字节数
      * 1024,8,4,0,0
      */
     public MessageDecoder(int maxFrameLength, int lengthFieldOffset, int lengthFieldLength, int lengthAdjustment, int initialBytesToStrip) {
@@ -45,11 +45,11 @@ public class MessageDecoder extends LengthFieldBasedFrameDecoder {
 
     @Override
     protected Message decode(ChannelHandlerContext ctx, ByteBuf in) {
-        Message message=new Message();
+        Message message = new Message();
         //检查魔数,魔数只有4字节
         byte[] magic = new byte[4];
         in.readBytes(magic);
-        if (!ArrayUtil.equals(magic,MAGIC_NUM)){
+        if (!ArrayUtil.equals(magic, MAGIC_NUM)) {
             throw new IllegalArgumentException("Invalid magic number");
         }
         //获取数据类型
@@ -61,22 +61,23 @@ public class MessageDecoder extends LengthFieldBasedFrameDecoder {
 
         //元数据
         int metadataLength = in.readInt();
-        if (metadataLength!=0){
-            byte[] metadata=new byte[metadataLength];
+        if (metadataLength != 0) {
+            byte[] metadata = new byte[metadataLength];
             in.readBytes(metadata);
             String jsonStr = new String(metadata, StandardCharsets.UTF_8);
             Map<String, Object> metaData = JSONUtil.parseObj(jsonStr);
             message.setMetaData(metaData);
         }
 
+        int dataLength = in.readInt();
         //原本的数据
-        if (in.readInt() == 0) {
+        if (dataLength == 0) {
             return message;
         }
-        int dataLength = in.readInt();
-        byte[] bytes = new byte[dataLength];
 
+        byte[] bytes = new byte[dataLength];
         in.readBytes(bytes);
+
         message.setData(bytes);
 
 //        System.out.println("接受的消息:");

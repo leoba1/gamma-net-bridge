@@ -46,6 +46,7 @@ public class ProxyServerHandler extends ChannelInboundHandlerAdapter {
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         log.debug("有客户端连接到代理服务器,id为:{}", ctx.channel().id().asLongText());
 
+
         ServerHandler.channelMap.put(ctx.channel().id().asLongText(), ctx.channel());
         proxyChannelGroup.add(ctx.channel());
         //有请求过来，开启本地客户端连接

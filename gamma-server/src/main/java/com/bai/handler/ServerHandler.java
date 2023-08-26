@@ -88,25 +88,25 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
 
     }
 
-    @Override
-    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        //TODO 移除信息
-        isReg = false;
-        serverChannelGroup.remove(ctx.channel());
-        ctx.close();
-    }
+//    @Override
+//    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+//        // 移除信息
+//        isReg = false;
+//        serverChannelGroup.remove(ctx.channel());
+//        ctx.close();
+//    }
 
-    @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        Message message = new Message();
-        message.setType(Message.TYPE_ERROR);
-        HashMap<String, Object> map = new HashMap<>(5, 0.8f);
-        map.put(ERROR_MSG, cause);
-        message.setMetaData(map);
-        ctx.channel().writeAndFlush(message);
-        serverChannelGroup.remove(ctx.channel());
-        cause.printStackTrace();
-        ctx.close();
-    }
+//    @Override
+//    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+//        Message message = new Message();
+//        message.setType(Message.TYPE_ERROR);
+//        HashMap<String, Object> map = new HashMap<>(5, 0.8f);
+//        map.put(ERROR_MSG, cause);
+//        message.setMetaData(map);
+//        ctx.channel().writeAndFlush(message);
+//        serverChannelGroup.remove(ctx.channel());
+//        cause.printStackTrace();
+//        ctx.close();
+//    }
 
 }

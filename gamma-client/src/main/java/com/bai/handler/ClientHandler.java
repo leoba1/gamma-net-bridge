@@ -85,6 +85,10 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
                     break;
                 }
                 byte[] data = message.getData();
+                if (data == null) {
+                    log.info("数据为空!");
+                    break;
+                }
                 localChannel.writeAndFlush(data);
                 break;
             case Message.TYPE_DISCONNECT:
