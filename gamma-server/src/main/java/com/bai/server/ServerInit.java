@@ -43,7 +43,6 @@ public class ServerInit {
             boosGroup.shutdownGracefully();
             workGroup.shutdownGracefully();
             e.printStackTrace();
-            throw new RuntimeException(e);
         }
     }
 

@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.bai.constants.Constants.*;
+import static com.bai.processor.ClientProcessor.portChannelMap;
 
 /**
  * @author bzh
@@ -80,6 +81,7 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
 //                Channel localChannel = ClientProcessor.portChannelMap.get(String.valueOf(toPort));
 
                 Channel localChannel = SessionFactory.getSession().getChannel(visitorId);
+//                Channel channel = portChannelMap.get(toPort);
                 if (localChannel == null) {
                     log.info("本地连接不存在!");
                     break;

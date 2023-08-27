@@ -46,7 +46,6 @@ public class ProxyServerHandler extends ChannelInboundHandlerAdapter {
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         log.debug("有客户端连接到代理服务器,id为:{}", ctx.channel().id().asLongText());
 
-
         ServerHandler.channelMap.put(ctx.channel().id().asLongText(), ctx.channel());
         proxyChannelGroup.add(ctx.channel());
         //有请求过来，开启本地客户端连接
@@ -64,6 +63,8 @@ public class ProxyServerHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        log.debug("channels数量:{}",proxyChannelGroup.size());
+
         if (msg == null || ctx == null) {
             return;
         }
@@ -75,7 +76,7 @@ public class ProxyServerHandler extends ChannelInboundHandlerAdapter {
         HashMap<String, Object> map = new HashMap<>(5, 0.8f);
         map.put("visitorId", ctx.channel().id().asLongText());
 //        map.put(FROM,port);
-//        map.put(TO, ServerProcessor.portMap.get(port));
+        map.put(TO, ServerProcessor.portMap.get(port));
         message.setMetaData(map);
         serverChannel.writeAndFlush(message);
 

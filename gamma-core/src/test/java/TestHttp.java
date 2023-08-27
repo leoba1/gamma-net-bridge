@@ -9,6 +9,8 @@ import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_LENGTH;
 
 
@@ -18,10 +20,13 @@ import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_LENGTH;
  */
 @Slf4j
 public class TestHttp {
+
+
     public static void main(String[] args) {
         NioEventLoopGroup boss = new NioEventLoopGroup();
         NioEventLoopGroup worker = new NioEventLoopGroup();
         try {
+            AtomicInteger atomicInteger = new AtomicInteger(0);
             ServerBootstrap serverBootstrap = new ServerBootstrap();
             serverBootstrap.channel(NioServerSocketChannel.class);
             serverBootstrap.group(boss, worker);
@@ -33,13 +38,14 @@ public class TestHttp {
                     ch.pipeline().addLast(new SimpleChannelInboundHandler<HttpRequest>() {
                         @Override
                         public void channelActive(ChannelHandlerContext ctx) throws Exception {
-                            log.debug("ttt,{}",ctx.channel().id().asLongText());
+//                            log.debug("ttt,{}",ctx.channel().id().asLongText());
                             System.out.println(ctx.channel().id().asLongText());
                         }
 
                         @Override
                         protected void channelRead0(ChannelHandlerContext ctx, HttpRequest msg) throws Exception {
-                            log.debug("请求：{}",msg.uri());
+                            atomicInteger.incrementAndGet();
+                            System.out.println(atomicInteger.get()+msg.uri());
 
                             //返回响应
                             DefaultFullHttpResponse defaultFullHttpResponse =

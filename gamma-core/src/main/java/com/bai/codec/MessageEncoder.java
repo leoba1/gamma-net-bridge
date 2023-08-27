@@ -23,6 +23,9 @@ public class MessageEncoder extends MessageToByteEncoder<Message> {
     public MessageEncoder() {
     }
 
+    /**
+     * 魔数4位+数据类型1位+版本号1位+总数据长度4位+元数据长度4位+元数据+消息数据(总数据长度-元数据长度)
+     */
     @Override
     protected void encode(ChannelHandlerContext ctx, Message msg, ByteBuf out) {
         //写入魔数4
@@ -30,36 +33,31 @@ public class MessageEncoder extends MessageToByteEncoder<Message> {
         //数据类型1
         out.writeByte(msg.getType());
         //版本号1
-        out.writeByte(2);
+        out.writeByte(3);
         //log
 //        ByteBufUtils.bufLog(out);
 
-        if (msg.getMetaData() == null || msg.getMetaData().isEmpty()) {
-            //元数据长度4
-            out.writeInt(0);
+        //获取元数据
+        String jsonStr = JSONUtil.toJsonStr(msg.getMetaData());
+
+        int metaDataLength = jsonStr.getBytes().length;
+
+        if (msg.getData() != null) {
+            int dataLength = msg.getData().length;
+            //总数据长度4
+            out.writeInt(metaDataLength + dataLength + 4);//+ 4 元数据长度位4，给帧解码器用的
         } else {
-            String jsonStr = JSONUtil.toJsonStr(msg.getMetaData());
-            //元数据长度4
-            out.writeInt(jsonStr.getBytes().length);
-            //元数据
-            if (jsonStr.getBytes().length > 0) {
-                out.writeBytes(jsonStr.getBytes(StandardCharsets.UTF_8));
-            }
+            //总数据长度4
+            out.writeInt(metaDataLength + 4);//+ 4 元数据长度位4
         }
-        //log
-//        ByteBufUtils.bufLog(out);
-        if (msg.getData() == null || msg.getData().length == 0) {
-            //消息长度4
-            out.writeInt(0);
-        } else {
-            //消息长度4
-            out.writeInt(msg.getData().length);
-            // 消息本身
-            if (msg.getData() != null) {
-                out.writeBytes(msg.getData());
-            }
+
+        //元数据长度4
+        out.writeInt(metaDataLength);
+        //元数据
+        out.writeBytes(jsonStr.getBytes(StandardCharsets.UTF_8));
+
+        if (msg.getData() != null) {
+            out.writeBytes(msg.getData());
         }
-        //log
-//        ByteBufUtils.bufLog(out);
     }
 }
