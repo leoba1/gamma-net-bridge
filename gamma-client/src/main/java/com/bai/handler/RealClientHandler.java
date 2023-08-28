@@ -1,7 +1,6 @@
 package com.bai.handler;
 
 import com.bai.message.Message;
-import com.bai.session.SessionFactory;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -9,6 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.net.InetSocketAddress;
 import java.util.HashMap;
+
+import static com.bai.processor.ClientProcessor.channelPortMap;
 
 /**
  * 处理实际本地服务处理器
@@ -20,7 +21,6 @@ import java.util.HashMap;
 public class RealClientHandler extends ChannelInboundHandlerAdapter {
 
     private Channel clientChannel;
-    private int port;
 
     public RealClientHandler(Channel channel) {
         this.clientChannel = channel;
@@ -30,8 +30,6 @@ public class RealClientHandler extends ChannelInboundHandlerAdapter {
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         log.debug("ttt,{}",ctx.channel().id().asLongText());
         log.info("本地客户端连接成功:"+ctx.channel().remoteAddress());
-        InetSocketAddress inetSocketAddress = (InetSocketAddress) ctx.channel().localAddress();
-        this.port = inetSocketAddress.getPort();
     }
 
     @Override
@@ -39,11 +37,13 @@ public class RealClientHandler extends ChannelInboundHandlerAdapter {
         //接受到本地服务的响应，准备发送给服务器
         byte[] data = (byte[]) msg;
         Message dataMessage = new Message();
-        String visitorId = SessionFactory.getSession().getId(ctx.channel());
+//        String visitorId = SessionFactory.getSession().getId(ctx.channel());
+        Integer port = channelPortMap.get(ctx.channel());
         dataMessage.setType(Message.TYPE_TRANSFER);
         dataMessage.setData(data);
         HashMap<String,Object> metaData=new HashMap<>(2,1f);
-        metaData.put("visitorId",visitorId);
+//        metaData.put("visitorId",visitorId);
+        metaData.put("toPort",port);
         dataMessage.setMetaData(metaData);
         clientChannel.writeAndFlush(dataMessage);
     }

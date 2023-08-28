@@ -14,5 +14,6 @@ public interface Constants {
     String ERROR_MSG="err";
     String FROM = "from";
     String TO = "to";
+    int RANDOM=1 << 16;
 
 }

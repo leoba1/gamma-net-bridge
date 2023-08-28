@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static com.bai.constants.Constants.RANDOM;
+
 /**
  * 处理注册、消息转发逻辑
  * @author bzh
@@ -34,8 +36,9 @@ public class ServerProcessor {
     private final NioEventLoopGroup bossGroup = new NioEventLoopGroup();
     private final NioEventLoopGroup workerGroup = new NioEventLoopGroup();
     private final ChannelGroup proxyChannelGroup=new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
-    private final Map<Integer,Channel> portChannelMap=new ConcurrentHashMap<>(6,0.8f,4);;
+    public final static Map<Integer,Channel> portChannelMap=new ConcurrentHashMap<>(6,0.8f,4);;
     public final static Map<Integer,Integer> portMap=new ConcurrentHashMap<>(6,0.8f,4);;
+    public final static Map<Integer,Integer> fromPortMap=new ConcurrentHashMap<>(6,0.8f,4);;
 
     /**
      * 处理注册逻辑，开启对应的端口监听
@@ -52,14 +55,16 @@ public class ServerProcessor {
         List<Integer> visitors =(List<Integer>) metaData.get("visitors");
 
         for (int i = 0; i < clients.size(); i++) {
-            portMap.put(visitors.get(i),clients.get(i));
+//            portMap.put(visitors.get(i),clients.get(i));
+            portMap.put(clients.get(i),visitors.get(i));
+            fromPortMap.put(visitors.get(i),clients.get(i));
         }
 
         String host = ConfigReaderUtil.ConfigReader("server.host");
 
         try {
             for (int visitor : visitors) {
-                if (portChannelMap.containsKey(visitor)){
+                if (portChannelMap.containsKey(visitor + RANDOM)){
                     continue;
                 }
 
@@ -74,7 +79,7 @@ public class ServerProcessor {
                 };
                 ServerInit serverInit = new ServerInit();
                 serverInit.init(bossGroup, workerGroup, channelInitializer, host, visitor);
-                portChannelMap.put(visitor,serverInit.getChannel());
+                portChannelMap.put(visitor + RANDOM,serverInit.getChannel());
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -88,12 +93,16 @@ public class ServerProcessor {
      */
     public void ProcessTransfer(ChannelHandlerContext ctx, Message message) {
         Map<String, Object> metaData = message.getMetaData();
-        String visitorId = (String) metaData.get("visitorId");
-        Channel proxyChannel = ServerHandler.channelMap.get(visitorId);
+//        String visitorId = (String) metaData.get("visitorId");
+        Integer toPort = (Integer) metaData.get("toPort");
+//        Channel proxyChannel = ServerHandler.channelMap.get(visitorId);
+        Integer proxyPort = portMap.get(toPort);
+        Channel proxyChannel = portChannelMap.get(proxyPort);
         if (proxyChannel == null) {
             throw new IllegalArgumentException("channel不存在!");
         }
         byte[] data = message.getData();
+        System.out.println(proxyChannel.id().asLongText());
         proxyChannel.writeAndFlush(data);
     }
 }

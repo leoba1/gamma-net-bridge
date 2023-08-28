@@ -2,6 +2,7 @@ package com.bai.handler;
 
 import com.bai.message.Message;
 import com.bai.processor.ServerProcessor;
+import com.bai.utils.Debounce;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -17,6 +18,7 @@ import java.util.HashMap;
 
 import static com.bai.constants.Constants.FROM;
 import static com.bai.constants.Constants.TO;
+import static com.bai.processor.ServerProcessor.portChannelMap;
 
 /**
  * 反向代理处理器，处理外部发出来的请求
@@ -44,6 +46,13 @@ public class ProxyServerHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
+        ctx.channel().config().setAutoRead(false);
+        ctx.channel().read();
+
+        InetSocketAddress inetSocketAddress = (InetSocketAddress) ctx.channel().localAddress();
+        this.port = inetSocketAddress.getPort();
+        portChannelMap.put(port,ctx.channel());
+
         log.debug("有客户端连接到代理服务器,id为:{}", ctx.channel().id().asLongText());
 
         ServerHandler.channelMap.put(ctx.channel().id().asLongText(), ctx.channel());
@@ -51,14 +60,17 @@ public class ProxyServerHandler extends ChannelInboundHandlerAdapter {
         //有请求过来，开启本地客户端连接
         Message message = new Message();
         HashMap<String, Object> map = new HashMap<>(5, 0.8f);
-//        map.put(FROM, port);
-//        map.put(TO, ServerProcessor.portMap.get(port));
+        map.put(FROM, port);
+        map.put(TO, ServerProcessor.fromPortMap.get(port));
         map.put("visitorId", ctx.channel().id().asLongText());
         message.setMetaData(map);
         message.setType(Message.TYPE_CONNECT);
+//        Debounce debounce = new Debounce(200);
+//        debounce.debounce(()->{
+//            log.debug("执行了防抖active");
+//            serverChannel.writeAndFlush(message);
+//        });
         serverChannel.writeAndFlush(message);
-        InetSocketAddress inetSocketAddress = (InetSocketAddress) ctx.channel().localAddress();
-        this.port = inetSocketAddress.getPort();
     }
 
     @Override
@@ -75,11 +87,15 @@ public class ProxyServerHandler extends ChannelInboundHandlerAdapter {
         message.setData(data);
         HashMap<String, Object> map = new HashMap<>(5, 0.8f);
         map.put("visitorId", ctx.channel().id().asLongText());
-//        map.put(FROM,port);
-        map.put(TO, ServerProcessor.portMap.get(port));
+        map.put(FROM,port);
+        map.put(TO, ServerProcessor.fromPortMap.get(port));
         message.setMetaData(map);
+//        Debounce debounce = new Debounce(200);
+//        debounce.debounce(()->{
+//            log.debug("执行了防抖read");
+//            serverChannel.writeAndFlush(message);
+//        });
         serverChannel.writeAndFlush(message);
-
     }
 
 //    @Override

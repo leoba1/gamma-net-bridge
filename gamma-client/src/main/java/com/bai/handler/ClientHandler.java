@@ -74,14 +74,14 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
             case Message.TYPE_TRANSFER:
                 //处理数据传输逻辑
                 Map<String, Object> metaData = message.getMetaData();
-                String visitorId = (String) metaData.get("visitorId");
+//                String visitorId = (String) metaData.get("visitorId");
 //                int fromPort = (int) metaData.get(FROM);
-//                int toPort = (int) metaData.get(TO);
+                int toPort = (int) metaData.get(TO);
 
 //                Channel localChannel = ClientProcessor.portChannelMap.get(String.valueOf(toPort));
 
-                Channel localChannel = SessionFactory.getSession().getChannel(visitorId);
-//                Channel channel = portChannelMap.get(toPort);
+//                Channel localChannel = SessionFactory.getSession().getChannel(visitorId);同一个请求会发送两次，所以这里不能用这个
+                Channel localChannel = portChannelMap.get(toPort);
                 if (localChannel == null) {
                     log.info("本地连接不存在!");
                     break;

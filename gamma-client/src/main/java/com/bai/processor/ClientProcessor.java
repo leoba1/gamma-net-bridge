@@ -26,7 +26,8 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class ClientProcessor {
 
-    public static final Map<String, Channel> portChannelMap = new ConcurrentHashMap<>(6,0.8f,4);;
+    public static final Map<Integer, Channel> portChannelMap = new ConcurrentHashMap<>(6,0.8f,4);;
+    public static final Map<Channel, Integer> channelPortMap = new ConcurrentHashMap<>(6,0.8f,4);;
 
     //本地监听服务器线程池
     private NioEventLoopGroup group = new NioEventLoopGroup();
@@ -39,10 +40,10 @@ public class ClientProcessor {
     public void doConnect(ChannelHandlerContext ctx, Message message) {
         List<String> ports = ConfigReaderUtil.ConfigReaders("client.port");
         Map<String, Object> metaData = message.getMetaData();
-        String visitorId = (String) metaData.get("visitorId");
+//        String visitorId = (String) metaData.get("visitorId");
 
         for (String port : ports) {
-            if (portChannelMap.containsKey(port)){
+            if (portChannelMap.containsKey(Integer.valueOf(port))){
                 continue;
             }
             ChannelInitializer<NioSocketChannel> channelInitializer= new ChannelInitializer<>() {
@@ -58,8 +59,9 @@ public class ClientProcessor {
             clientInit.init(group,channelInitializer,localHost,Integer.valueOf(port));
 
 //            channelMap.put(visitorId,clientInit.getChannel());
-            SessionFactory.getSession().bind(clientInit.getChannel(),visitorId);
-            portChannelMap.put(port,clientInit.getChannel());
+//            SessionFactory.getSession().bind(clientInit.getChannel(),visitorId);
+            portChannelMap.put(Integer.valueOf(port),clientInit.getChannel());
+            channelPortMap.put(clientInit.getChannel(),Integer.valueOf(port));
         }
     }
 }

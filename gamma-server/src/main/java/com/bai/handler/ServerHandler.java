@@ -64,9 +64,6 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
                     Throwable cause = (Throwable) message.getMetaData().get(ERROR_MSG);
                     cause.printStackTrace();
                     break;
-//                case Message.TYPE_CONNECT:
-//
-//                    break;
                 default:
                     //未知消息类型
                     log.info("未知消息类型!");
