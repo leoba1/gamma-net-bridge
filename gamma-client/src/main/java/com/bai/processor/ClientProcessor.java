@@ -17,6 +17,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
+
+import static com.bai.constants.Constants.RANDOM;
 
 /**
  * 处理客户端业务逻辑
@@ -37,13 +40,13 @@ public class ClientProcessor {
      * @param ctx ctx
      * @param message 消息
      */
-    public void doConnect(ChannelHandlerContext ctx, Message message) {
+    public void doConnect(ChannelHandlerContext ctx, Message message, CountDownLatch countDownLatch) {
         List<String> ports = ConfigReaderUtil.ConfigReaders("client.port");
         Map<String, Object> metaData = message.getMetaData();
 //        String visitorId = (String) metaData.get("visitorId");
 
         for (String port : ports) {
-            if (portChannelMap.containsKey(Integer.valueOf(port))){
+            if (portChannelMap.containsKey(Integer.parseInt(port)+RANDOM)){
                 continue;
             }
             ChannelInitializer<NioSocketChannel> channelInitializer= new ChannelInitializer<>() {
@@ -51,7 +54,7 @@ public class ClientProcessor {
                 protected void initChannel(NioSocketChannel ch) throws Exception {
                     ch.pipeline().addLast(new ByteArrayEncoder());
                     ch.pipeline().addLast(new ByteArrayDecoder());
-                    ch.pipeline().addLast(new RealClientHandler(ctx.channel()));
+                    ch.pipeline().addLast(new RealClientHandler(ctx.channel(),countDownLatch));
                 }
             };
             ClientInit clientInit=new ClientInit();
@@ -60,7 +63,7 @@ public class ClientProcessor {
 
 //            channelMap.put(visitorId,clientInit.getChannel());
 //            SessionFactory.getSession().bind(clientInit.getChannel(),visitorId);
-            portChannelMap.put(Integer.valueOf(port),clientInit.getChannel());
+            portChannelMap.put(Integer.parseInt(port) + RANDOM,clientInit.getChannel());
             channelPortMap.put(clientInit.getChannel(),Integer.valueOf(port));
         }
     }

@@ -46,8 +46,10 @@ public class ProxyServerHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        ctx.channel().config().setAutoRead(false);
-        ctx.channel().read();
+
+        //是否删掉
+//        ctx.channel().config().setAutoRead(false);
+//        ctx.channel().read();
 
         InetSocketAddress inetSocketAddress = (InetSocketAddress) ctx.channel().localAddress();
         this.port = inetSocketAddress.getPort();

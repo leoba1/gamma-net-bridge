@@ -8,8 +8,10 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.net.InetSocketAddress;
 import java.util.HashMap;
+import java.util.concurrent.CountDownLatch;
 
 import static com.bai.processor.ClientProcessor.channelPortMap;
+import static com.bai.processor.ClientProcessor.portChannelMap;
 
 /**
  * 处理实际本地服务处理器
@@ -22,14 +24,20 @@ public class RealClientHandler extends ChannelInboundHandlerAdapter {
 
     private Channel clientChannel;
 
-    public RealClientHandler(Channel channel) {
+    private CountDownLatch countDownLatch;
+
+    public RealClientHandler(Channel channel, CountDownLatch countDownLatch) {
         this.clientChannel = channel;
+        this.countDownLatch= countDownLatch;
     }
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         log.debug("ttt,{}",ctx.channel().id().asLongText());
         log.info("本地客户端连接成功:"+ctx.channel().remoteAddress());
+        Integer port = channelPortMap.get(ctx.channel());
+        portChannelMap.put(port,ctx.channel());
+        countDownLatch.countDown();
     }
 
     @Override

@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
 
 import static com.bai.constants.Constants.*;
 import static com.bai.processor.ClientProcessor.portChannelMap;
@@ -25,7 +26,7 @@ import static com.bai.processor.ClientProcessor.portChannelMap;
  */
 @Slf4j
 public class ClientHandler extends ChannelInboundHandlerAdapter {
-
+    CountDownLatch countDownLatch = new CountDownLatch(1);
     private static ClientProcessor clientProcessor = new ClientProcessor();
 
     @Override
@@ -81,6 +82,7 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
 //                Channel localChannel = ClientProcessor.portChannelMap.get(String.valueOf(toPort));
 
 //                Channel localChannel = SessionFactory.getSession().getChannel(visitorId);同一个请求会发送两次，所以这里不能用这个
+                countDownLatch.await();
                 Channel localChannel = portChannelMap.get(toPort);
                 if (localChannel == null) {
                     log.info("本地连接不存在!");
@@ -99,7 +101,7 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
                 break;
             case Message.TYPE_CONNECT:
                 //开启本地端口监听
-                clientProcessor.doConnect(ctx, message);
+                clientProcessor.doConnect(ctx, message,countDownLatch);
                 break;
             case Message.TYPE_ERROR:
                 //异常信息
